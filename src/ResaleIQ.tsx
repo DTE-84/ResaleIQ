@@ -1017,11 +1017,11 @@ Return ONLY valid JSON, no markdown, no backticks:
 								)}
 							</div>
 
-							{[
+							{([
 								{ label: "Sale Price ($)", key: "salePrice" },
 								{ label: "What You Paid ($)", key: "purchaseCost" },
 								{ label: "Shipping Cost ($)", key: "shippingCost" },
-							].map((f) => (
+							] as { label: string; key: keyof typeof calc }[]).map((f) => (
 								<div key={f.key} style={{ marginBottom: 14 }}>
 									<div
 										style={{
