@@ -1,5 +1,33 @@
 import React, { useState, useEffect } from "react";
 
+type Platform = keyof typeof PLATFORMS;
+
+interface Listing {
+	title: string;
+	description: string;
+	suggested_price: number;
+	price_rationale: string;
+	tags: string[];
+	profit_score: number;
+	tips: string[];
+}
+
+interface InventoryItem {
+	id: number;
+	platform: Platform;
+	brand: string;
+	category: string;
+	condition: string;
+	color: string;
+	size: string;
+	purchasePrice: number;
+	title: string;
+	suggestedPrice: number;
+	profitScore: number;
+	status: string;
+	addedAt: number;
+}
+
 const PLATFORMS = {
 	vinted: { name: "Vinted", sellerFee: 0, accent: "#09B1BA" },
 	poshmark: { name: "Poshmark", sellerFee: 20, accent: "#E23F82" },
@@ -88,7 +116,7 @@ const BTN_GHOST = {
 
 export default function ResaleIQ() {
 	const [tab, setTab] = useState("generate");
-	const [platform, setPlatform] = useState<keyof typeof PLATFORMS>("vinted");
+	const [platform, setPlatform] = useState<Platform>("vinted");
 
 	// ── Listing Generator ──────────────────────────────────────────────────────
 	const [form, setForm] = useState({
@@ -101,9 +129,9 @@ export default function ResaleIQ() {
 		notes: "",
 	});
 	const [generating, setGenerating] = useState(false);
-	const [listing, setListing] = useState(null);
-	const [genError, setGenError] = useState(null);
-	const [copied, setCopied] = useState(null);
+	const [listing, setListing] = useState<Listing | null>(null);
+	const [genError, setGenError] = useState<string | null>(null);
+	const [copied, setCopied] = useState<string | null>(null);
 
 	// ── Profit Calc ───────────────────────────────────────────────────────────
 	const [calc, setCalc] = useState({
@@ -113,7 +141,7 @@ export default function ResaleIQ() {
 	});
 
 	// ── Inventory ─────────────────────────────────────────────────────────────
-	const [inventory, setInventory] = useState([]);
+	const [inventory, setInventory] = useState<InventoryItem[]>([]);
 	const [invLoaded, setInvLoaded] = useState(false);
 
 	useEffect(() => {
@@ -154,7 +182,12 @@ export default function ResaleIQ() {
 		try {
 			const res = await fetch("https://api.anthropic.com/v1/messages", {
 				method: "POST",
-				headers: { "Content-Type": "application/json" },
+				headers: { 
+					"Content-Type": "application/json",
+					"x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY,
+					"anthropic-version": "2023-06-01",
+					"anthropic-dangerous-direct-browser-access": "true"
+				},
 				body: JSON.stringify({
 					model: "claude-sonnet-4-6",
 					max_tokens: 1000,
@@ -266,7 +299,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 				</div>
 				<select
 					value={platform}
-					onChange={(e) => setPlatform(e.target.value)}
+					onChange={(e) => setPlatform(e.target.value as Platform)}
 					style={{
 						background: "transparent",
 						border: `1.5px solid ${p.accent}`,
