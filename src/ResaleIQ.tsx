@@ -111,11 +111,7 @@ export default function ResaleIQ() {
 		setInvLoaded(true);
 	}
 
-	function saveInv(items: typeof inventory) {
-		try {
-			localStorage.setItem("resaleiq-v1", JSON.stringify(items));
-		} catch (e) {}
-	}
+	
 
 	const p = PLATFORMS[platform];
 
@@ -178,7 +174,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 
 	function addToInv() {
 		if (!listing) return;
-		const item = {
+		const item: InventoryItem = {
 			id: Date.now(),
 			platform,
 			brand: form.brand,
@@ -193,21 +189,15 @@ Return ONLY valid JSON, no markdown, no backticks:
 			status: "draft",
 			addedAt: Date.now(),
 		};
-		const upd = [item, ...inventory];
-		setInventory(upd);
-		saveInv(upd);
-	}
-
-	function setStatus(id: number, status: string) {
-		const upd = inventory.map((i) => (i.id === id ? { ...i, status } : i));
-		setInventory(upd);
-		saveInv(upd);
+		setInventory(prev => [item, ...prev]);
 	}
 
 	function removeItem(id: number) {
-		const upd = inventory.filter((i) => i.id !== id);
-		setInventory(upd);
-		saveInv(upd);
+		setInventory(prev => prev.filter(i => i.id !== id));
+	}
+
+	function setStatus(id: number, status: string) {
+		setInventory(prev => prev.map(i => i.id === id ? { ...i, status } : i));
 	}
 
 	const inv = {
