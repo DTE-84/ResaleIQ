@@ -12,9 +12,7 @@ import {
   ShieldCheck,
   RefreshCcw,
   Plus,
-  Search,
   ExternalLink,
-  ChevronRight,
   Zap,
   Clock
 } from "lucide-react";
