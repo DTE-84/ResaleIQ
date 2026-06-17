@@ -126,7 +126,7 @@ export default function Auth() {
   async function handleGoogle() {
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin },
+      options: { redirectTo: import.meta.env.VITE_SITE_URL || window.location.origin },
     });
   }
 
