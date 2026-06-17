@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
+import { Eye, EyeOff } from "lucide-react";
 
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
@@ -23,6 +24,10 @@ const css = `
     max-width: 420px;
     box-shadow: 0 4px 40px rgba(0,0,0,0.08);
   }
+  .auth-input-container {
+    position: relative;
+    width: 100%;
+  }
   .auth-input {
     width: 100%;
     background: #F8F5F0;
@@ -37,6 +42,22 @@ const css = `
   }
   .auth-input:focus { border-color: #D4A843; }
   .auth-input::placeholder { color: #B0A898; }
+  .auth-password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #B0A898;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    transition: color 0.2s;
+  }
+  .auth-password-toggle:hover { color: #1C1C1C; }
   .auth-btn {
     width: 100%;
     background: #1C1C1C;
@@ -102,6 +123,7 @@ export default function Auth() {
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -174,14 +196,23 @@ export default function Auth() {
 
         <div style={{ marginBottom: 20 }}>
           <div style={{ fontSize: 11, color: "#B0A898", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>Password</div>
-          <input
-            className="auth-input"
-            type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && handleSubmit()}
-          />
+          <div className="auth-input-container">
+            <input
+              className="auth-input"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && handleSubmit()}
+            />
+            <button 
+              type="button" 
+              className="auth-password-toggle"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </div>
 
         <button className="auth-btn" onClick={handleSubmit} disabled={!email || !password || loading}>

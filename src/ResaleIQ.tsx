@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { supabase } from "./lib/supabase";
 import { 
   Sparkles, 
   Calculator, 
@@ -14,7 +15,9 @@ import {
   Plus,
   ExternalLink,
   Zap,
-  Clock
+  Clock,
+  LogOut,
+  User as UserIcon
 } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -72,6 +75,7 @@ const CATEGORIES = [
 export default function ResaleIQ() {
 	const [tab, setTab] = useState("generate");
 	const [platform, setPlatform] = useState<Platform>("vinted");
+	const [userEmail, setUserEmail] = useState<string | null>(null);
 
 	// ── Listing Generator ──────────────────────────────────────────────────────
 	const [form, setForm] = useState({
@@ -101,7 +105,14 @@ export default function ResaleIQ() {
 
 	useEffect(() => {
 		loadInv();
+		supabase.auth.getUser().then(({ data: { user } }) => {
+			if (user) setUserEmail(user.email || null);
+		});
 	}, []);
+
+	async function handleLogout() {
+		await supabase.auth.signOut();
+	}
 
 	function loadInv() {
 		try {
@@ -111,7 +122,11 @@ export default function ResaleIQ() {
 		setInvLoaded(true);
 	}
 
-	
+	function saveInv(items: typeof inventory) {
+		try {
+			localStorage.setItem("resaleiq-v1", JSON.stringify(items));
+		} catch (e) {}
+	}
 
 	const p = PLATFORMS[platform];
 
@@ -131,15 +146,22 @@ export default function ResaleIQ() {
 		setListing(null);
 		setGenError(null);
 		try {
-			const res = await fetch("/api/generate", {
+			const res = await fetch("https://api.anthropic.com/v1/messages", {
 				method: "POST",
-				headers: { "Content-Type": "application/json" },
+				headers: { 
+					"Content-Type": "application/json",
+					"x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY,
+					"anthropic-version": "2023-06-01",
+					"anthropic-dangerous-direct-browser-access": "true"
+				},
 				body: JSON.stringify({
-				  model: "claude-sonnet-4-6",
-				  max_tokens: 1000,
-				  messages: [{
-					role: "user",
-					content: `You are a top resale seller on ${p.name} who maximizes profit. Create an optimized listing.
+					model: "claude-3-5-sonnet-20241022",
+					max_tokens: 1000,
+					messages: [
+						{
+							role: "user",
+							content: `You are a top resale seller on ${p.name} who maximizes profit. Create an optimized listing.
+
 Brand: ${form.brand}
 Category: ${form.category}
 Condition: ${form.condition}
@@ -189,15 +211,21 @@ Return ONLY valid JSON, no markdown, no backticks:
 			status: "draft",
 			addedAt: Date.now(),
 		};
-		setInventory(prev => [item, ...prev]);
-	}
-
-	function removeItem(id: number) {
-		setInventory(prev => prev.filter(i => i.id !== id));
+		const upd = [item, ...inventory];
+		setInventory(upd);
+		saveInv(upd);
 	}
 
 	function setStatus(id: number, status: string) {
-		setInventory(prev => prev.map(i => i.id === id ? { ...i, status } : i));
+		const upd = inventory.map((i) => (i.id === id ? { ...i, status } : i));
+		setInventory(upd);
+		saveInv(upd);
+	}
+
+	function removeItem(id: number) {
+		const upd = inventory.filter((i) => i.id !== id);
+		setInventory(upd);
+		saveInv(upd);
 	}
 
 	const inv = {
@@ -223,45 +251,83 @@ Return ONLY valid JSON, no markdown, no backticks:
 			<div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 				{/* HEADER */}
 				<header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
-					<div className="space-y-1">
-						<div className="flex items-center gap-3">
-							<div className="w-12 h-12 bg-espresso-brown rounded-2xl flex items-center justify-center shadow-xl shadow-espresso-brown/10">
-								<Zap className="text-resale-gold w-7 h-7 fill-resale-gold" />
+					<div className="flex items-center justify-between w-full md:w-auto">
+						<div className="space-y-1">
+							<div className="flex items-center gap-3">
+								<div className="w-12 h-12 bg-espresso-brown rounded-2xl flex items-center justify-center shadow-xl shadow-espresso-brown/10">
+									<Zap className="text-resale-gold w-7 h-7 fill-resale-gold" />
+								</div>
+								<h1 className="text-3xl font-display font-black tracking-tighter uppercase text-espresso-brown leading-none">
+									Resale<span className="text-resale-gold">IQ</span>
+								</h1>
 							</div>
-							<h1 className="text-3xl font-display font-black tracking-tighter uppercase text-espresso-brown leading-none">
-								Resale<span className="text-resale-gold">IQ</span>
-							</h1>
+							<p className="text-[10px] font-black uppercase tracking-[0.4em] text-espresso-brown/40 pl-1">
+								Strategic Intelligence Nexus
+							</p>
 						</div>
-						<p className="text-[10px] font-black uppercase tracking-[0.4em] text-espresso-brown/40 pl-1">
-							Strategic Intelligence Nexus
-						</p>
+
+						{/* Mobile User Indicator & Logout */}
+						<div className="flex md:hidden items-center gap-3">
+							<div className="flex flex-col items-end">
+								<div className="text-[9px] font-black text-espresso-brown/40 uppercase tracking-widest leading-none">Logged in as</div>
+								<div className="text-[11px] font-bold text-espresso-brown truncate max-w-[120px]">{userEmail?.split('@')[0]}</div>
+							</div>
+							<button 
+								onClick={handleLogout}
+								className="w-10 h-10 rounded-xl bg-espresso-brown/5 flex items-center justify-center text-espresso-brown/40 hover:text-red-500 transition-colors"
+							>
+								<LogOut className="w-5 h-5" />
+							</button>
+						</div>
 					</div>
 
-					<div className="flex items-center gap-2 p-1 bg-espresso-brown/5 rounded-2xl border border-espresso-brown/5 overflow-x-auto scrollbar-hide">
-						{[
-							{ id: "generate", label: "Generate", icon: Sparkles },
-							{ id: "profit", label: "Profit", icon: Calculator },
-							{ id: "inventory", label: "The Vault", icon: Package },
-						].map((t) => (
-							<button
-								key={t.id}
-								onClick={() => setTab(t.id)}
-								className={cn(
-									"flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap",
-									tab === t.id 
-										? "bg-white text-espresso-brown shadow-lg border border-espresso-brown/5 scale-105" 
-										: "text-espresso-brown/40 hover:text-espresso-brown/60"
-								)}
+					<div className="flex flex-col md:flex-row items-center gap-6">
+						<div className="flex items-center gap-2 p-1 bg-espresso-brown/5 rounded-2xl border border-espresso-brown/5 overflow-x-auto scrollbar-hide w-full md:w-auto">
+							{[
+								{ id: "generate", label: "Generate", icon: Sparkles },
+								{ id: "profit", label: "Profit", icon: Calculator },
+								{ id: "inventory", label: "The Vault", icon: Package },
+							].map((t) => (
+								<button
+									key={t.id}
+									onClick={() => setTab(t.id)}
+									className={cn(
+										"flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap",
+										tab === t.id 
+											? "bg-white text-espresso-brown shadow-lg border border-espresso-brown/5 scale-105" 
+											: "text-espresso-brown/40 hover:text-espresso-brown/60"
+									)}
+								>
+									<t.icon className={cn("w-3.5 h-3.5", tab === t.id ? "text-cobalt-pulse" : "text-current")} />
+									{t.label}
+									{t.id === "inventory" && inv.total > 0 && (
+										<span className="bg-cobalt-pulse text-white text-[8px] px-1.5 py-0.5 rounded-full">
+											{inv.total}
+										</span>
+									)}
+								</button>
+							))}
+						</div>
+
+						{/* Desktop User Indicator & Logout */}
+						<div className="hidden md:flex items-center gap-6 pl-6 border-l border-espresso-brown/10">
+							<div className="flex items-center gap-3">
+								<div className="w-10 h-10 rounded-full bg-cobalt-pulse/10 flex items-center justify-center text-cobalt-pulse border border-cobalt-pulse/20">
+									<UserIcon className="w-5 h-5" />
+								</div>
+								<div className="flex flex-col">
+									<span className="text-[9px] font-black text-espresso-brown/40 uppercase tracking-widest leading-none">Authenticated</span>
+									<span className="text-xs font-bold text-espresso-brown">{userEmail}</span>
+								</div>
+							</div>
+							<button 
+								onClick={handleLogout}
+								className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-espresso-brown/40 hover:text-red-500 transition-colors group"
 							>
-								<t.icon className={cn("w-3.5 h-3.5", tab === t.id ? "text-cobalt-pulse" : "text-current")} />
-								{t.label}
-								{t.id === "inventory" && inv.total > 0 && (
-									<span className="bg-cobalt-pulse text-white text-[8px] px-1.5 py-0.5 rounded-full">
-										{inv.total}
-									</span>
-								)}
+								<LogOut className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+								Logout
 							</button>
-						))}
+						</div>
 					</div>
 				</header>
 
