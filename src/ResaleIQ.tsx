@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 type Platform = keyof typeof PLATFORMS;
 
@@ -184,7 +184,7 @@ export default function ResaleIQ() {
 				method: "POST",
 				headers: { 
 					"Content-Type": "application/json",
-					"x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY,
+					
 					"anthropic-version": "2023-06-01",
 					"anthropic-dangerous-direct-browser-access": "true"
 				},
