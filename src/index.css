@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-boutique-creame text-espresso-brown font-sans;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/40 backdrop-blur-md border border-espresso-brown/10 shadow-xl;
+  }
+  .btn-kinetic {
+    @apply transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:scale-100;
+  }
+}
