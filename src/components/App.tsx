@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
-import Auth from "../lib/Auth";
+import Auth from "./Auth";
 import ResaleIQ from "../ResaleIQ";
 
 export default function App() {

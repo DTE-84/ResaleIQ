@@ -135,22 +135,15 @@ export default function ResaleIQ() {
 		setListing(null);
 		setGenError(null);
 		try {
-			const res = await fetch("https://api.anthropic.com/v1/messages", {
+			const res = await fetch("/api/generate", {
 				method: "POST",
-				headers: { 
-					"Content-Type": "application/json",
-					"x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY,
-					"anthropic-version": "2023-06-01",
-					"anthropic-dangerous-direct-browser-access": "true"
-				},
+				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					model: "claude-3-5-sonnet-20241022",
-					max_tokens: 1000,
-					messages: [
-						{
-							role: "user",
-							content: `You are a top resale seller on ${p.name} who maximizes profit. Create an optimized listing.
-
+				  model: "claude-sonnet-4-6",
+				  max_tokens: 1000,
+				  messages: [{
+					role: "user",
+					content: `You are a top resale seller on ${p.name} who maximizes profit. Create an optimized listing.
 Brand: ${form.brand}
 Category: ${form.category}
 Condition: ${form.condition}
