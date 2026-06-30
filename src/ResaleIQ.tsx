@@ -267,99 +267,103 @@ Return ONLY valid JSON, no markdown, no backticks:
 				/>
 			</div>
 
-			<div className='relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
-				{/* HEADER */}
-				<header className='flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12'>
-					<div className='flex items-center justify-between w-full md:w-auto'>
-						<div className='space-y-1'>
-							<div className='flex items-center gap-3'>
-								<div className='w-12 h-12 bg-espresso-brown rounded-2xl flex items-center justify-center shadow-xl shadow-espresso-brown/10'>
-									<Zap className='text-resale-gold w-7 h-7 fill-resale-gold' />
-								</div>
-								<h1 className='text-3xl font-display font-black tracking-tighter uppercase text-espresso-brown leading-none'>
-									Resale<span className='text-resale-gold'>IQ</span>
-								</h1>
-							</div>
-							<p className='text-[10px] font-black uppercase tracking-[0.4em] text-espresso-brown/40 pl-1'>
-								Strategic Intelligence Nexus
-							</p>
-						</div>
+			<div className='relative z-10 max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 py-5 sm:py-8'>
+			{/* HEADER */}
+			<header className='flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-5 mb-6 sm:mb-10'>
 
-						{/* Mobile User Indicator & Logout */}
-						<div className='flex md:hidden items-center gap-3'>
-							<div className='flex flex-col items-end'>
-								<div className='text-[9px] font-black text-espresso-brown/40 uppercase tracking-widest leading-none'>
-									Logged in as
-								</div>
-								<div className='text-[11px] font-bold text-espresso-brown truncate max-w-[120px]'>
-									{userEmail?.split("@")[0]}
-								</div>
+				{/* ROW 1: Logo + Mobile logout */}
+				<div className='flex items-center justify-between w-full md:w-auto'>
+					<div className='space-y-0.5'>
+						<div className='flex items-center gap-2.5'>
+							<div className='w-9 h-9 sm:w-11 sm:h-11 bg-espresso-brown rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shadow-espresso-brown/10 shrink-0'>
+								<Zap className='text-resale-gold w-5 h-5 sm:w-6 sm:h-6 fill-resale-gold' />
 							</div>
-							<button
-								onClick={handleLogout}
-								className='w-10 h-10 rounded-xl bg-espresso-brown/5 flex items-center justify-center text-espresso-brown/40 hover:text-red-500 transition-colors'>
-								<LogOut className='w-5 h-5' />
-							</button>
+							<h1 className='text-2xl sm:text-3xl font-display font-black tracking-tighter uppercase text-espresso-brown leading-none'>
+								Resale<span className='text-resale-gold'>IQ</span>
+							</h1>
 						</div>
+						<p className='text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] sm:tracking-[0.4em] text-espresso-brown/40 pl-0.5'>
+							Strategic Intelligence Nexus
+						</p>
 					</div>
 
-					<div className='flex flex-col md:flex-row items-center gap-6'>
-						<div className='flex items-center gap-2 p-1 bg-espresso-brown/5 rounded-2xl border border-espresso-brown/5 overflow-x-auto scrollbar-hide w-full md:w-auto'>
-							{[
-								{ id: "generate", label: "Generate", icon: Sparkles },
-								{ id: "profit", label: "Profit", icon: Calculator },
-								{ id: "inventory", label: "The Vault", icon: Package },
-								{ id: "pricer", label: "Flip Pricer", icon: Tag },
-							].map((t) => (
-								<button
-									key={t.id}
-									onClick={() => setTab(t.id)}
+					{/* Mobile User Indicator & Logout */}
+					<div className='flex md:hidden items-center gap-2'>
+						<div className='flex flex-col items-end'>
+							<div className='text-[8px] font-black text-espresso-brown/40 uppercase tracking-widest leading-none'>
+								Logged in as
+							</div>
+							<div className='text-[10px] font-bold text-espresso-brown truncate max-w-[100px]'>
+								{userEmail?.split("@")[0]}
+							</div>
+						</div>
+						<button
+							onClick={handleLogout}
+							className='w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-espresso-brown/5 flex items-center justify-center text-espresso-brown/40 hover:text-red-500 transition-colors'>
+							<LogOut className='w-4 h-4' />
+						</button>
+					</div>
+				</div>
+
+				{/* ROW 2: Nav tabs + Desktop user */}
+				<div className='flex flex-col md:flex-row items-stretch md:items-center gap-3 sm:gap-5 w-full md:w-auto'>
+					{/* Nav Pill */}
+					<div className='flex items-center gap-1 p-1 bg-espresso-brown/5 rounded-xl sm:rounded-2xl border border-espresso-brown/5 w-full md:w-auto'>
+						{[
+							{ id: "generate", label: "Generate", icon: Sparkles },
+							{ id: "profit", label: "Profit", icon: Calculator },
+							{ id: "inventory", label: "The Vault", icon: Package },
+							{ id: "pricer", label: "Flip Pricer", icon: Tag },
+						].map((t) => (
+							<button
+								key={t.id}
+								onClick={() => setTab(t.id)}
+								className={cn(
+									"flex-1 md:flex-none flex items-center justify-center gap-1.5 px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest transition-all whitespace-nowrap",
+									tab === t.id
+										? "bg-white text-espresso-brown shadow-md border border-espresso-brown/5 scale-105"
+										: "text-espresso-brown/40 hover:text-espresso-brown/60",
+								)}>
+								<t.icon
 									className={cn(
-										"flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap",
-										tab === t.id
-											? "bg-white text-espresso-brown shadow-lg border border-espresso-brown/5 scale-105"
-											: "text-espresso-brown/40 hover:text-espresso-brown/60",
-									)}>
-									<t.icon
-										className={cn(
-											"w-3.5 h-3.5",
-											tab === t.id ? "text-cobalt-pulse" : "text-current",
-										)}
-									/>
-									{t.label}
-									{t.id === "inventory" && inv.total > 0 && (
-										<span className='bg-cobalt-pulse text-white text-[8px] px-1.5 py-0.5 rounded-full'>
-											{inv.total}
-										</span>
+										"w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0",
+										tab === t.id ? "text-cobalt-pulse" : "text-current",
 									)}
-								</button>
-							))}
-						</div>
-
-						{/* Desktop User Indicator & Logout */}
-						<div className='hidden md:flex items-center gap-6 pl-6 border-l border-espresso-brown/10'>
-							<div className='flex items-center gap-3'>
-								<div className='w-10 h-10 rounded-full bg-cobalt-pulse/10 flex items-center justify-center text-cobalt-pulse border border-cobalt-pulse/20'>
-									<UserIcon className='w-5 h-5' />
-								</div>
-								<div className='flex flex-col'>
-									<span className='text-[9px] font-black text-espresso-brown/40 uppercase tracking-widest leading-none'>
-										Authenticated
+								/>
+								{t.label}
+								{t.id === "inventory" && inv.total > 0 && (
+									<span className='bg-cobalt-pulse text-white text-[7px] sm:text-[8px] px-1 sm:px-1.5 py-0.5 rounded-full'>
+										{inv.total}
 									</span>
-									<span className='text-xs font-bold text-espresso-brown'>
-										{userEmail}
-									</span>
-								</div>
-							</div>
-							<button
-								onClick={handleLogout}
-								className='flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-espresso-brown/40 hover:text-red-500 transition-colors group'>
-								<LogOut className='w-4 h-4 group-hover:translate-x-0.5 transition-transform' />
-								Logout
+								)}
 							</button>
-						</div>
+						))}
 					</div>
-				</header>
+
+					{/* Desktop User Indicator & Logout */}
+					<div className='hidden md:flex items-center gap-5 pl-5 border-l border-espresso-brown/10'>
+						<div className='flex items-center gap-3'>
+							<div className='w-9 h-9 rounded-full bg-cobalt-pulse/10 flex items-center justify-center text-cobalt-pulse border border-cobalt-pulse/20'>
+								<UserIcon className='w-4 h-4' />
+							</div>
+							<div className='flex flex-col'>
+								<span className='text-[9px] font-black text-espresso-brown/40 uppercase tracking-widest leading-none'>
+									Authenticated
+								</span>
+								<span className='text-xs font-bold text-espresso-brown'>
+									{userEmail}
+								</span>
+							</div>
+						</div>
+						<button
+							onClick={handleLogout}
+							className='flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-espresso-brown/40 hover:text-red-500 transition-colors group'>
+							<LogOut className='w-4 h-4 group-hover:translate-x-0.5 transition-transform' />
+							Logout
+						</button>
+					</div>
+				</div>
+			</header>
 
 				<main>
 					<AnimatePresence mode='wait'>
