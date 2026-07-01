@@ -41,19 +41,20 @@ interface Listing {
 }
 
 interface InventoryItem {
-	id: number;
+	id: string;
 	platform: Platform;
 	brand: string;
 	category: string;
 	condition: string;
 	color: string;
 	size: string;
-	purchasePrice: number;
+	purchase_price: number;
 	title: string;
-	suggestedPrice: number;
-	profitScore: number;
+	suggested_price: number;
+	actual_sale_price: number;
+	profit_score: number;
 	status: string;
-	addedAt: number;
+	added_at: string;
 }
 
 const PLATFORMS = {
@@ -92,6 +93,7 @@ export default function ResaleIQ() {
 	const [tab, setTab] = useState("generate");
 	const [platform, setPlatform] = useState<Platform>("vinted");
 	const [userEmail, setUserEmail] = useState<string | null>(null);
+	const [userId, setUserId] = useState<string | null>(null);
 
 	// ── Listing Generator ──────────────────────────────────────────────────────
 	const [form, setForm] = useState({
@@ -120,9 +122,14 @@ export default function ResaleIQ() {
 	const [invLoaded, setInvLoaded] = useState(false);
 
 	useEffect(() => {
-		loadInv();
 		supabase.auth.getUser().then(({ data: { user } }) => {
-			if (user) setUserEmail(user.email || null);
+			if (user) {
+				setUserEmail(user.email || null);
+				setUserId(user.id);
+				loadInv(user.id);
+			} else {
+				setInvLoaded(true);
+			}
 		});
 	}, []);
 
@@ -130,18 +137,19 @@ export default function ResaleIQ() {
 		await supabase.auth.signOut();
 	}
 
-	function loadInv() {
+	async function loadInv(uid: string) {
 		try {
-			const r = localStorage.getItem("resaleiq-v1");
-			if (r) setInventory(JSON.parse(r));
-		} catch (e) {}
+			const { data, error } = await supabase
+				.from("inventory")
+				.select("*")
+				.eq("user_id", uid)
+				.order("added_at", { ascending: false });
+			if (error) throw error;
+			setInventory(data || []);
+		} catch (e) {
+			console.error("Failed to load inventory:", e);
+		}
 		setInvLoaded(true);
-	}
-
-	function saveInv(items: typeof inventory) {
-		try {
-			localStorage.setItem("resaleiq-v1", JSON.stringify(items));
-		} catch (e) {}
 	}
 
 	const p = PLATFORMS[platform];
@@ -210,38 +218,56 @@ Return ONLY valid JSON, no markdown, no backticks:
 		setTimeout(() => setCopied(null), 2000);
 	}
 
-	function addToInv() {
-		if (!listing) return;
-		const item: InventoryItem = {
-			id: Date.now(),
+	async function addToInv() {
+		if (!listing || !userId) return;
+		
+		const newItem = {
+			user_id: userId,
 			platform,
 			brand: form.brand,
 			category: form.category,
 			condition: form.condition,
 			color: form.color,
 			size: form.size,
-			purchasePrice: parseFloat(form.purchasePrice) || 0,
+			purchase_price: parseFloat(form.purchasePrice) || 0,
 			title: listing.title,
-			suggestedPrice: listing.suggested_price,
-			profitScore: listing.profit_score,
-			status: "draft",
-			addedAt: Date.now(),
+			suggested_price: listing.suggested_price,
+			actual_sale_price: 0,
+			profit_score: listing.profit_score,
+			status: "draft"
 		};
-		const upd = [item, ...inventory];
-		setInventory(upd);
-		saveInv(upd);
+
+		const { data, error } = await supabase
+			.from("inventory")
+			.insert([newItem])
+			.select()
+			.single();
+			
+		if (!error && data) {
+			setInventory([data, ...inventory]);
+		}
 	}
 
-	function setStatus(id: number, status: string) {
-		const upd = inventory.map((i) => (i.id === id ? { ...i, status } : i));
-		setInventory(upd);
-		saveInv(upd);
+	async function setStatus(id: string, status: string) {
+		const { error } = await supabase
+			.from("inventory")
+			.update({ status })
+			.eq("id", id);
+			
+		if (!error) {
+			setInventory(inventory.map((i) => (i.id === id ? { ...i, status } : i)));
+		}
 	}
 
-	function removeItem(id: number) {
-		const upd = inventory.filter((i) => i.id !== id);
-		setInventory(upd);
-		saveInv(upd);
+	async function removeItem(id: string) {
+		const { error } = await supabase
+			.from("inventory")
+			.delete()
+			.eq("id", id);
+			
+		if (!error) {
+			setInventory(inventory.filter((i) => i.id !== id));
+		}
 	}
 
 	const inv = {
@@ -250,10 +276,11 @@ Return ONLY valid JSON, no markdown, no backticks:
 		sold: inventory.filter((i) => i.status === "sold").length,
 		activeVal: inventory
 			.filter((i) => i.status !== "sold")
-			.reduce((s, i) => s + (i.suggestedPrice || 0), 0),
+			.reduce((s, i) => s + (i.suggested_price || 0), 0),
 		soldVal: inventory
 			.filter((i) => i.status === "sold")
-			.reduce((s, i) => s + (i.suggestedPrice || 0), 0),
+			.reduce((s, i) => s + (i.actual_sale_price || i.suggested_price || 0), 0),
+
 	};
 
 	return (
@@ -308,7 +335,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 				{/* ROW 2: Nav tabs + Desktop user */}
 				<div className='flex flex-col md:flex-row items-stretch md:items-center gap-3 sm:gap-5 w-full md:w-auto'>
 					{/* Nav Pill */}
-					<div className='flex items-center gap-1 p-1 bg-espresso-brown/5 rounded-xl sm:rounded-2xl border border-espresso-brown/5 w-full md:w-auto'>
+					<div className='flex items-center gap-1 p-1 bg-espresso-brown/5 rounded-xl sm:rounded-2xl border border-espresso-brown/5 w-full md:w-auto overflow-x-auto scrollbar-hide'>
 						{[
 							{ id: "generate", label: "Generate", icon: Sparkles },
 							{ id: "profit", label: "Profit", icon: Calculator },
@@ -989,7 +1016,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 								animate={{ opacity: 1, y: 0 }}
 								className='space-y-8'>
 								{/* Vault Intelligence Header */}
-								<div className='grid grid-cols-2 lg:grid-cols-5 gap-4'>
+								<div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4'>
 									{[
 										{ label: "Total Units", val: inv.total, icon: Package },
 										{
@@ -1088,7 +1115,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 													</div>
 													<div className='text-right'>
 														<div className='text-2xl font-black font-display text-cobalt-pulse tracking-tighter'>
-															${item.suggestedPrice}
+															${item.suggested_price}
 														</div>
 														<div className='text-[8px] font-black text-espresso-brown/20 uppercase tracking-widest'>
 															Est. Market
