@@ -19,6 +19,9 @@ import {
 	Clock,
 	LogOut,
 	User as UserIcon,
+	Camera,
+	Crown,
+	Lock,
 } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -64,6 +67,7 @@ const PLATFORMS = {
 	mercari: { name: "Mercari", sellerFee: 10, accent: "#2DCC70", logo: "M" },
 	offerup: { name: "OfferUp", sellerFee: 12.9, accent: "#FF7B00", logo: "O" },
 	facebook: { name: "FB", sellerFee: 5, accent: "#1877F2", logo: "F" },
+	ebay: { name: "eBay (Pro)", sellerFee: 13.25, accent: "#0064D2", logo: "E" },
 };
 
 const CONDITIONS = ["New with tags", "Like new", "Good", "Fair", "Poor"];
@@ -341,6 +345,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 							{ id: "profit", label: "Profit", icon: Calculator },
 							{ id: "inventory", label: "The Vault", icon: Package },
 							{ id: "pricer", label: "Flip Pricer", icon: Tag },
+							{ id: "visual", label: "Visual V3", icon: Camera, premium: true },
 						].map((t) => (
 							<button
 								key={t.id}
@@ -358,6 +363,9 @@ Return ONLY valid JSON, no markdown, no backticks:
 									)}
 								/>
 								{t.label}
+								{t.premium && (
+									<Crown className="w-3 h-3 text-resale-gold ml-0.5" />
+								)}
 								{t.id === "inventory" && inv.total > 0 && (
 									<span className='bg-cobalt-pulse text-white text-[7px] sm:text-[8px] px-1 sm:px-1.5 py-0.5 rounded-full'>
 										{inv.total}
@@ -366,6 +374,12 @@ Return ONLY valid JSON, no markdown, no backticks:
 							</button>
 						))}
 					</div>
+
+					{/* Upgrade Button */}
+					<button className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-resale-gold to-yellow-600 text-white shadow-lg shadow-resale-gold/20 hover:scale-105 transition-transform text-[10px] font-black uppercase tracking-widest ml-auto">
+						<Crown className="w-3.5 h-3.5" />
+						Upgrade Pro
+					</button>
 
 					{/* Desktop User Indicator & Logout */}
 					<div className='hidden md:flex items-center gap-5 pl-5 border-l border-espresso-brown/10'>
@@ -1181,6 +1195,37 @@ Return ONLY valid JSON, no markdown, no backticks:
 								exit={{ opacity: 0, y: -20 }}
 							>
 								<FlipPricer />
+							</motion.div>
+						)}
+
+						{/* ══ TAB: VISUAL V3 (Moat Scaffolding) ════════════════════════════════════════════════ */}
+						{tab === "visual" && (
+							<motion.div
+								key='visual'
+								initial={{ opacity: 0, y: 20 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: -20 }}
+								className="max-w-2xl mx-auto"
+							>
+								<div className="bg-white rounded-3xl p-8 sm:p-12 shadow-xl shadow-espresso-brown/5 text-center relative overflow-hidden border border-espresso-brown/10 border-t-resale-gold/30">
+									<div className="absolute top-0 right-0 p-4">
+										<div className="bg-gradient-to-r from-resale-gold to-yellow-600 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg shadow-resale-gold/20">
+											<Crown className="w-3 h-3" />
+											Pro Feature
+										</div>
+									</div>
+									<div className="w-20 h-20 bg-espresso-brown/5 rounded-2xl mx-auto flex items-center justify-center mb-6">
+										<Camera className="w-10 h-10 text-espresso-brown/40" />
+									</div>
+									<h2 className="text-2xl font-display font-black text-espresso-brown mb-4 tracking-tight">Visual Ingestion AI</h2>
+									<p className="text-espresso-brown/60 mb-8 max-w-md mx-auto">
+										Take a photo of any item. We'll use Claude 3.5 Sonnet to identify the exact model and cross-reference real-world sold prices via the Market Truth Protocol (eBay API).
+									</p>
+									<button className="w-full sm:w-auto px-8 py-4 bg-espresso-brown text-white rounded-xl font-bold hover:bg-espresso-brown/90 transition-all flex items-center justify-center gap-2 mx-auto disabled:opacity-50 disabled:cursor-not-allowed cursor-not-allowed">
+										<Lock className="w-4 h-4 text-resale-gold" />
+										Locked in Freemium
+									</button>
+								</div>
 							</motion.div>
 						)}
 					</AnimatePresence>
