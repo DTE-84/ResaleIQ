@@ -321,7 +321,7 @@ Rules:
             )}
             <div>
               <h2 className="text-3xl font-black uppercase tracking-tighter text-espresso-brown">
-                Flip <span className="text-cobalt-pulse">Pricer</span>
+                Flip <span className="text-emerald-500">Pricer</span>
               </h2>
               <p className="text-[10px] font-black text-espresso-brown/40 uppercase tracking-[0.4em] pl-1">
                 {view === "categories" ? "Select category to analyze" : view === "form" ? cat?.label : `${cat?.label} · Market Analysis`}
@@ -386,7 +386,7 @@ Rules:
                       value={formData[field.id] || ""}
                       onChange={e => setFormData(p => ({ ...p, [field.id]: e.target.value }))}
                       placeholder={field.placeholder}
-                      className="w-full bg-white border border-espresso-brown/10 rounded-2xl p-4 text-sm font-bold focus:outline-none focus:border-cobalt-pulse/30 transition-all"
+                      className="w-full bg-white border border-espresso-brown/10 rounded-2xl p-4 text-sm font-bold focus:outline-none focus:border-emerald-500/30 transition-all"
                     />
                   )}
                   {field.type === "chips" && field.options && (
@@ -442,7 +442,7 @@ Rules:
                     value={paid}
                     onChange={e => setPaid(e.target.value)}
                     min={0}
-                    className="w-full bg-white border border-espresso-brown/10 rounded-2xl p-4 pl-8 text-2xl font-black focus:outline-none focus:border-cobalt-pulse/30 transition-all font-mono"
+                    className="w-full bg-white border border-espresso-brown/10 rounded-2xl p-4 pl-8 text-2xl font-black focus:outline-none focus:border-emerald-500/30 transition-all font-mono"
                   />
                 </div>
               </div>
@@ -576,7 +576,7 @@ Rules:
                 {best && (
                   <div className="bg-white/60 backdrop-blur-xl border border-espresso-brown/10 rounded-4xl p-6 shadow-xl flex items-center justify-between gap-6">
                     <div>
-                      <p className="text-[10px] font-black text-cobalt-pulse uppercase tracking-widest mb-2">🏆 Best Platform</p>
+                      <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-2">🏆 Best Platform</p>
                       <h4 className="text-xl font-black uppercase tracking-tighter text-espresso-brown">{best.name}</h4>
                       <p className="text-xs font-bold text-espresso-brown/50 mt-1 max-w-xs">{best.reason}</p>
                     </div>

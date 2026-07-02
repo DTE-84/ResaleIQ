@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResaleIQ | Architecture & Breakdown</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "boutique-creame": "#FFFDF5",
+                        "espresso-brown": "#2C1E16",
+                        "cobalt-pulse": "#0047AB",
+                        "resale-gold": "#D4AF37",
+                        "frosted-tan": "#F2EFE9",
+                        "emerald-500": "#10B981"
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                        display: ["Space Grotesk", "sans-serif"],
+                        mono: ["JetBrains Mono", "monospace"],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #FFFDF5;
+            color: #2C1E16;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .glass-card {
+            background: rgba(242, 239, 233, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+        
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #2C1E16 0%, #D4AF37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .interactive-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .interactive-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(44, 30, 22, 0.1);
+            border-color: rgba(212, 175, 55, 0.5);
+        }
+    </style>
+</head>
+<body class="font-sans min-h-screen selection:bg-resale-gold selection:text-boutique-creame">
+    
+    <!-- Background Accents -->
+    <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-[20%] -right-[10%] w-[50%] h-[50%] rounded-full bg-resale-gold/5 blur-[120px]"></div>
+        <div class="absolute top-[40%] -left-[10%] w-[40%] h-[40%] rounded-full bg-emerald-500/5 blur-[100px]"></div>
+    </div>
+
+    <div class="relative z-10 max-w-5xl mx-auto px-6 py-12 md:py-20">
+        
+        <!-- Header -->
+        <header class="mb-16 md:mb-24 flex flex-col items-start gap-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-resale-gold/30 bg-resale-gold/10 text-espresso-brown font-mono text-xs uppercase tracking-widest font-medium">
+                <span class="w-1.5 h-1.5 rounded-full bg-resale-gold animate-pulse"></span>
+                System Architecture Brief
+            </div>
+            <h1 class="text-5xl md:text-7xl font-display font-bold tracking-tight text-espresso-brown">
+                Resale<span class="gold-gradient-text">IQ</span>
+            </h1>
+            <p class="text-lg md:text-xl text-espresso-brown/70 font-light max-w-2xl mt-2 leading-relaxed">
+                A deterministic market intelligence engine engineered for high-fidelity pricing accuracy and visual data ingestion.
+            </p>
+            
+            <div class="flex flex-wrap items-center gap-4 mt-6">
+                <a href="/" class="interactive-hover bg-espresso-brown text-boutique-creame px-8 py-4 rounded-xl font-medium tracking-wide flex items-center gap-3">
+                    Launch Application
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
+                <a href="https://dte-solutions.icu" class="interactive-hover glass-card text-espresso-brown px-8 py-4 rounded-xl font-medium tracking-wide flex items-center gap-3">
+                    Return to Nexus
+                </a>
+            </div>
+        </header>
+
+        <!-- Core Infrastructure -->
+        <section class="mb-20">
+            <h2 class="text-3xl font-display font-bold mb-8 flex items-center gap-3">
+                <span class="text-resale-gold">/</span> The V3 Architecture Moat
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Visual Ingestion -->
+                <div class="glass-card p-8 rounded-2xl interactive-hover relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-resale-gold/10 rounded-bl-full -z-10 transition-transform group-hover:scale-110"></div>
+                    <div class="w-12 h-12 bg-boutique-creame rounded-xl border border-resale-gold/20 flex items-center justify-center mb-6 shadow-sm">
+                        <svg class="w-6 h-6 text-resale-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold font-display mb-3">Visual Ingestion</h3>
+                    <p class="text-espresso-brown/70 leading-relaxed text-sm">
+                        Powered by Claude 3.5 Sonnet, the platform parses multimodal image uploads to automatically extract product identifiers, condition, and categorical nuances, eliminating manual data entry friction.
+                    </p>
+                </div>
+
+                <!-- Market Truth Protocol -->
+                <div class="glass-card p-8 rounded-2xl interactive-hover relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-bl-full -z-10 transition-transform group-hover:scale-110"></div>
+                    <div class="w-12 h-12 bg-boutique-creame rounded-xl border border-emerald-500/20 flex items-center justify-center mb-6 shadow-sm">
+                        <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold font-display mb-3">Market Truth Protocol</h3>
+                    <p class="text-espresso-brown/70 leading-relaxed text-sm">
+                        Bypasses inflated active listing prices by pulling <em>real sold comps</em> from external APIs. This ensures all intelligence and pricing suggestions reflect deterministic market reality, not seller optimism.
+                    </p>
+                </div>
+
+                <!-- Data Integrity Node -->
+                <div class="glass-card p-8 rounded-2xl interactive-hover relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-cobalt-pulse/10 rounded-bl-full -z-10 transition-transform group-hover:scale-110"></div>
+                    <div class="w-12 h-12 bg-boutique-creame rounded-xl border border-cobalt-pulse/20 flex items-center justify-center mb-6 shadow-sm">
+                        <svg class="w-6 h-6 text-cobalt-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold font-display mb-3">Data Integrity Node</h3>
+                    <p class="text-espresso-brown/70 leading-relaxed text-sm">
+                        Structured storage via PostgreSQL schema ensuring 'Categorical to Ordinal' transformations. Every ingested item, tracked comp, and analytical output maintains strict data integrity for flawless retrieval.
+                    </p>
+                </div>
+
+                <!-- Analytical Output -->
+                <div class="glass-card p-8 rounded-2xl interactive-hover relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-espresso-brown/10 rounded-bl-full -z-10 transition-transform group-hover:scale-110"></div>
+                    <div class="w-12 h-12 bg-boutique-creame rounded-xl border border-espresso-brown/20 flex items-center justify-center mb-6 shadow-sm">
+                        <svg class="w-6 h-6 text-espresso-brown" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold font-display mb-3">Analytical Output</h3>
+                    <p class="text-espresso-brown/70 leading-relaxed text-sm">
+                        Actionable intelligence layer defining expected profit margins, velocity of sale, and pricing tiers (Quick Sale vs Max Value) presented in a high-fidelity, frictionless user interface.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Pedigree -->
+        <section class="mb-20">
+            <h2 class="text-3xl font-display font-bold mb-8 flex items-center gap-3">
+                <span class="text-resale-gold">/</span> Technical Pedigree
+            </h2>
+            <div class="bg-espresso-brown text-boutique-creame rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
+                <div class="absolute -right-20 -bottom-20 opacity-5">
+                    <svg class="w-96 h-96" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 relative z-10">
+                    <div>
+                        <div class="text-resale-gold font-mono text-sm mb-2 opacity-80">01. Frontend Engine</div>
+                        <div class="font-display font-bold text-xl">React + Vite</div>
+                        <div class="text-boutique-creame/60 text-sm mt-1">High-performance SPA</div>
+                    </div>
+                    <div>
+                        <div class="text-resale-gold font-mono text-sm mb-2 opacity-80">02. Aesthetic Layer</div>
+                        <div class="font-display font-bold text-xl">Tailwind CSS</div>
+                        <div class="text-boutique-creame/60 text-sm mt-1">Boutique Creame / Espresso Brown</div>
+                    </div>
+                    <div>
+                        <div class="text-resale-gold font-mono text-sm mb-2 opacity-80">03. Inference Core</div>
+                        <div class="font-display font-bold text-xl">Claude 3.5 Sonnet</div>
+                        <div class="text-boutique-creame/60 text-sm mt-1">Visual Multimodal Ingestion</div>
+                    </div>
+                    <div>
+                        <div class="text-resale-gold font-mono text-sm mb-2 opacity-80">04. Data Layer</div>
+                        <div class="font-display font-bold text-xl">PostgreSQL Node</div>
+                        <div class="text-boutique-creame/60 text-sm mt-1">Structured Telemetry</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="border-t border-espresso-brown/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-espresso-brown/50 font-mono">
+            <div>
+                &copy; 2026 DTE Ecosystem. All rights reserved.
+            </div>
+            <div class="flex items-center gap-6">
+                <a href="https://dte-solutions.icu" class="hover:text-resale-gold transition-colors">dte-solutions.icu</a>
+                <span>System Optimizer: Nova</span>
+            </div>
+        </footer>
+
+    </div>
+</body>
+</html>
