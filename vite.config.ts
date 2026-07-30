@@ -40,6 +40,6 @@ export default defineConfig(({ mode }) => {
         }
       }
     ],
-    base: '/ResaleIQ/',
+    base: '/',
   }
 })
