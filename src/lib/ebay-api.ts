@@ -33,7 +33,7 @@ export async function initiateEbayAuth(userId: string) {
 /**
  * Pushes a generated listing to eBay as a Draft.
  */
-export async function createEbayDraft(payload: EbayListingPayload, userToken: string) {
+export async function createEbayDraft(payload: EbayListingPayload, _userToken: string) {
   // TODO: Implement eBay Sell API call
   console.log('[eBay API] Creating draft listing...', payload);
   return { success: true, draftId: 'MOCK_EBAY_DRAFT_123' };
