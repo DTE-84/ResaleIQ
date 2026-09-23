@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { RefreshCcw, ChevronLeft, TrendingUp, Search, Zap } from "lucide-react";
+import { supabase } from "../lib/supabase";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -262,27 +263,19 @@ Rules:
     const timer = setTimeout(() => ctrl.abort(), 25000);
 
     try {
-      const res = await fetch("/api/generate", {
-        method: "POST",
-        signal: ctrl.signal,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "claude-3-5-sonnet-20241022",
-          max_tokens: 1200,
-          messages: [{ role: "user", content: buildPrompt() }],
-        }),
+      const res = await supabase.functions.invoke('visual-ingestion', {
+        body: {
+          action: 'generate-text',
+          payload: { prompt: buildPrompt() }
+        }
       });
-
+      
       clearTimeout(timer);
-      if (!res.ok) {
-        const e = await res.json().catch(() => ({})) as { error?: { message?: string } };
-        throw new Error(e?.error?.message || `API error ${res.status}`);
+      if (res.error) {
+        throw new Error(res.error.message || `API error`);
       }
 
-      const data = await res.json() as { content: Array<{ type: string; text: string }> };
-      const text = data.content?.find(b => b.type === "text")?.text || "";
+      const text = res.data?.text || "";
       const clean = text.replace(/```[\s\S]*?```/g, "").replace(/`/g, "").trim();
       const s = clean.indexOf("{");
       const e2 = clean.lastIndexOf("}");

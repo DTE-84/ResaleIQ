@@ -21,7 +21,6 @@ import {
 	User as UserIcon,
 	Camera,
 	Crown,
-	Lock,
 } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -99,7 +98,47 @@ export default function ResaleIQ() {
 	const [userEmail, setUserEmail] = useState<string | null>(null);
 	const [userId, setUserId] = useState<string | null>(null);
 
-	// ── Listing Generator ──────────────────────────────────────────────────────
+	// 📸 Visual V3 📸
+	const [visualImage, setVisualImage] = useState<string | null>(null);
+	const [visualProcessing, setVisualProcessing] = useState(false);
+	const [visualResult, setVisualResult] = useState<any>(null);
+	const [visualError, setVisualError] = useState<string | null>(null);
+
+	const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+
+		const reader = new FileReader();
+		reader.onload = async (e) => {
+			const base64Url = e.target?.result as string;
+			setVisualImage(base64Url);
+			setVisualError(null);
+			setVisualResult(null);
+			setVisualProcessing(true);
+
+			try {
+				const base64Data = base64Url.split(",")[1];
+				const mimeType = file.type;
+
+				const res = await supabase.functions.invoke('visual-ingestion', {
+					body: {
+						action: 'analyze-image',
+						payload: { imageBase64: base64Data, mimeType }
+					}
+				});
+
+				if (res.error) throw new Error(res.error.message);
+				setVisualResult(res.data);
+			} catch (err: any) {
+				setVisualError(err.message || "Failed to analyze image");
+			} finally {
+				setVisualProcessing(false);
+			}
+		};
+		reader.readAsDataURL(file);
+	};
+
+	// 💰 Listing Generator 💰──────────────────────────────────────────────────────
 	const [form, setForm] = useState({
 		brand: "",
 		category: "Women's Tops",
@@ -174,21 +213,7 @@ export default function ResaleIQ() {
 		setListing(null);
 		setGenError(null);
 		try {
-			const res = await fetch("https://api.anthropic.com/v1/messages", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					"x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY,
-					"anthropic-version": "2023-06-01",
-					"anthropic-dangerous-direct-browser-access": "true",
-				},
-				body: JSON.stringify({
-					model: "claude-3-5-sonnet-20241022",
-					max_tokens: 1000,
-					messages: [
-						{
-							role: "user",
-							content: `You are a top resale seller on ${p.name} who maximizes profit. Create an optimized listing.
+			const prompt = `You are a top resale seller on ${p.name} who maximizes profit. Create an optimized listing.
 
 Brand: ${form.brand}
 Category: ${form.category}
@@ -199,16 +224,17 @@ Paid: ${form.purchasePrice ? "$" + form.purchasePrice : "not specified"}
 Notes: ${form.notes || "none"}
 
 Return ONLY valid JSON, no markdown, no backticks:
-{"title":"SEO-rich title under 60 chars","description":"3-4 paragraph listing with condition details, brand prestige, styling ideas, and call to action","suggested_price":0,"price_rationale":"1 sentence explaining the price","tags":["5","to","8","tags","no","hash","symbol"],"profit_score":0,"tips":["tip1","tip2","tip3"]}`,
-						},
-					],
-				}),
+{"title":"SEO-rich title under 60 chars","description":"3-4 paragraph listing with condition details, brand prestige, styling ideas, and call to action","suggested_price":0,"price_rationale":"1 sentence explaining the price","tags":["5","to","8","tags","no","hash","symbol"],"profit_score":0,"tips":["tip1","tip2","tip3"]}`;
+
+			const res = await supabase.functions.invoke('visual-ingestion', {
+				body: {
+					action: 'generate-text',
+					payload: { prompt }
+				}
 			});
-			const data = await res.json();
-			const txt = data.content
-				.filter((i: { type: string; text: string }) => i.type === "text")
-				.map((i: { type: string; text: string }) => i.text)
-				.join("");
+
+			if (res.error) throw new Error(res.error.message);
+			const txt = res.data?.text || "";
 			setListing(JSON.parse(txt.replace(/```json|```/g, "").trim()));
 		} catch (e) {
 			setGenError("Generation failed — check your item details and try again.");
@@ -1198,33 +1224,95 @@ Return ONLY valid JSON, no markdown, no backticks:
 							</motion.div>
 						)}
 
-						{/* ══ TAB: VISUAL V3 (Moat Scaffolding) ════════════════════════════════════════════════ */}
+						{/* 📸 TAB: VISUAL V3 (Moat Scaffolding) 📸 */}
 						{tab === "visual" && (
 							<motion.div
 								key='visual'
 								initial={{ opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: -20 }}
-								className="max-w-2xl mx-auto"
+								className="max-w-3xl mx-auto"
 							>
-								<div className="bg-white rounded-3xl p-8 sm:p-12 shadow-xl shadow-espresso-brown/5 text-center relative overflow-hidden border border-espresso-brown/10 border-t-resale-gold/30">
-									<div className="absolute top-0 right-0 p-4">
-										<div className="bg-gradient-to-r from-resale-gold to-yellow-600 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg shadow-resale-gold/20">
-											<Crown className="w-3 h-3" />
-											Pro Feature
+								<div className="bg-white rounded-3xl p-6 sm:p-10 shadow-xl shadow-espresso-brown/5 relative border border-espresso-brown/10">
+									<div className="text-center mb-8">
+										<div className="w-16 h-16 bg-espresso-brown/5 rounded-2xl mx-auto flex items-center justify-center mb-4">
+											<Camera className="w-8 h-8 text-espresso-brown/60" />
 										</div>
+										<h2 className="text-2xl font-display font-black text-espresso-brown tracking-tight">Visual Scanner</h2>
+										<p className="text-espresso-brown/60 text-sm mt-2">Powered by Claude 3.5 Sonnet & Market Truth Protocol</p>
 									</div>
-									<div className="w-20 h-20 bg-espresso-brown/5 rounded-2xl mx-auto flex items-center justify-center mb-6">
-										<Camera className="w-10 h-10 text-espresso-brown/40" />
-									</div>
-									<h2 className="text-2xl font-display font-black text-espresso-brown mb-4 tracking-tight">Visual Ingestion AI</h2>
-									<p className="text-espresso-brown/60 mb-8 max-w-md mx-auto">
-										Take a photo of any item. We'll use Claude 3.5 Sonnet to identify the exact model and cross-reference real-world sold prices via the Market Truth Protocol (eBay API).
-									</p>
-									<button className="w-full sm:w-auto px-8 py-4 bg-espresso-brown text-white rounded-xl font-bold hover:bg-espresso-brown/90 transition-all flex items-center justify-center gap-2 mx-auto disabled:opacity-50 disabled:cursor-not-allowed cursor-not-allowed">
-										<Lock className="w-4 h-4 text-resale-gold" />
-										Locked in Freemium
-									</button>
+
+									{!visualImage ? (
+										<div className="border-2 border-dashed border-espresso-brown/20 rounded-2xl p-12 text-center hover:bg-espresso-brown/5 transition-colors cursor-pointer relative">
+											<input 
+												type="file" 
+												accept="image/*" 
+												capture="environment"
+												onChange={handleImageUpload}
+												className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+											/>
+											<Camera className="w-10 h-10 text-espresso-brown/30 mx-auto mb-4" />
+											<p className="text-espresso-brown font-bold mb-1">Tap to Scan Item</p>
+											<p className="text-espresso-brown/50 text-sm">Upload or take a photo</p>
+										</div>
+									) : (
+										<div className="space-y-6">
+											<div className="relative rounded-2xl overflow-hidden bg-espresso-brown/5 border border-espresso-brown/10 h-64">
+												<img src={visualImage} alt="Scanned item" className="w-full h-full object-contain" />
+												{visualProcessing && (
+													<div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex flex-col items-center justify-center">
+														<RefreshCcw className="w-8 h-8 text-espresso-brown animate-spin mb-4" />
+														<p className="text-espresso-brown font-bold tracking-widest text-xs uppercase">Analyzing via Claude 3.5...</p>
+													</div>
+												)}
+											</div>
+
+											{visualError && (
+												<div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm text-center font-bold">
+													{visualError}
+												</div>
+											)}
+
+											{visualResult && (
+												<motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+													<div className="bg-espresso-brown/5 p-6 rounded-2xl border border-espresso-brown/10">
+														<div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-espresso-brown/50 mb-2">
+															<Tag className="w-3 h-3" /> Identification
+														</div>
+														<h3 className="text-xl font-bold text-espresso-brown mb-1">{visualResult.identification.title}</h3>
+														<p className="text-espresso-brown/70 text-sm">Brand: {visualResult.identification.brand} | Model: {visualResult.identification.model}</p>
+													</div>
+
+													<div className="bg-gradient-to-br from-emerald-500/10 to-teal-600/10 p-6 rounded-2xl border border-emerald-500/20">
+														<div className="flex justify-between items-start mb-4">
+															<div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-emerald-700">
+																<TrendingUp className="w-3 h-3" /> Valuation
+															</div>
+															<span className="text-[10px] font-bold bg-white/50 text-emerald-800 px-2 py-1 rounded-md uppercase tracking-wider">
+																{visualResult.valuation.source}
+															</span>
+														</div>
+														<div className="flex items-end gap-3">
+															<span className="text-4xl font-black text-emerald-600 tracking-tight">
+																${visualResult.valuation.averagePrice.toFixed(2)}
+															</span>
+															<span className="text-emerald-700/60 font-bold mb-1">Avg. Market Value</span>
+														</div>
+													</div>
+													
+													<button 
+														onClick={() => {
+															setVisualImage(null);
+															setVisualResult(null);
+														}}
+														className="w-full py-4 bg-espresso-brown text-white rounded-xl font-bold hover:bg-espresso-brown/90 transition-all uppercase tracking-widest text-xs"
+													>
+														Scan Another Item
+													</button>
+												</motion.div>
+											)}
+										</div>
+									)}
 								</div>
 							</motion.div>
 						)}
