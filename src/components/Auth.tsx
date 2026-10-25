@@ -8,6 +8,7 @@ const css = `
   body { background: #F2EDE4; }
   .auth-app {
     min-height: 100vh;
+    min-height: 100dvh;
     background: #F2EDE4;
     display: flex;
     flex-direction: column;
@@ -19,7 +20,7 @@ const css = `
   .auth-card {
     background: #fff;
     border-radius: 20px;
-    padding: 40px;
+    padding: clamp(24px, 6vw, 40px);
     width: 100%;
     max-width: 420px;
     box-shadow: 0 4px 40px rgba(0,0,0,0.08);

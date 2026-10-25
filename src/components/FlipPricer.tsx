@@ -298,7 +298,7 @@ Rules:
   return (
     <div className="space-y-8">
       {/* Section Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <div className="space-y-1">
           <div className="flex items-center gap-3">
             {view !== "categories" && (
@@ -310,17 +310,17 @@ Rules:
               </button>
             )}
             <div>
-              <h2 className="text-3xl font-black uppercase tracking-tighter text-espresso-brown">
+              <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter text-espresso-brown">
                 Flip <span className="text-emerald-500">Pricer</span>
               </h2>
-              <p className="text-[10px] font-black text-espresso-brown/40 uppercase tracking-[0.4em] pl-1">
+              <p className="text-[10px] font-black text-espresso-brown/40 uppercase tracking-[0.2em] sm:tracking-[0.4em] pl-1">
                 {view === "categories" ? "Select category to analyze" : view === "form" ? cat?.label : `${cat?.label} · Market Analysis`}
               </p>
             </div>
           </div>
         </div>
         {cat && view !== "categories" && (
-          <div className="text-4xl">{cat.emoji}</div>
+          <div className="text-3xl sm:text-4xl">{cat.emoji}</div>
         )}
       </div>
 
@@ -332,13 +332,13 @@ Rules:
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4"
           >
             {CATEGORIES.map(c => (
               <button
                 key={c.id}
                 onClick={() => pickCat(c)}
-                className="group bg-white/60 backdrop-blur-xl border border-espresso-brown/10 rounded-4xl p-6 text-left shadow-xl hover:shadow-2xl hover:border-espresso-brown/20 transition-all duration-300 hover:scale-[1.02] flex flex-col gap-4 relative overflow-hidden"
+                className="group bg-white/60 backdrop-blur-xl border border-espresso-brown/10 rounded-4xl p-4 sm:p-6 text-left shadow-xl hover:shadow-2xl hover:border-espresso-brown/20 transition-all duration-300 hover:scale-[1.02] flex flex-col gap-4 relative overflow-hidden"
               >
                 <div className="text-3xl">{c.emoji}</div>
                 <div>
@@ -362,7 +362,7 @@ Rules:
             exit={{ opacity: 0, y: -20 }}
             className="max-w-2xl"
           >
-            <section className="bg-white/60 backdrop-blur-xl border border-espresso-brown/10 rounded-5xl p-8 shadow-2xl relative overflow-hidden space-y-6">
+            <section className="bg-white/60 backdrop-blur-xl border border-espresso-brown/10 rounded-4xl sm:rounded-5xl p-5 sm:p-8 shadow-2xl relative overflow-hidden space-y-6">
               <div className="absolute top-0 left-0 w-full h-1" style={{ background: `linear-gradient(to right, transparent, ${cat.accent}40, transparent)` }} />
 
               {/* Category fields */}
@@ -499,12 +499,12 @@ Rules:
                 className="space-y-6"
               >
                 {/* Main results terminal */}
-                <section className="bg-espresso-brown rounded-5xl p-1 border border-white/5 shadow-[0_40px_100px_rgba(0,0,0,0.25)] relative overflow-hidden">
-                  <div className="bg-white/5 p-8 rounded-[2.4rem] space-y-8">
+                <section className="bg-espresso-brown rounded-4xl sm:rounded-5xl p-1 border border-white/5 shadow-[0_40px_100px_rgba(0,0,0,0.25)] relative overflow-hidden">
+                  <div className="bg-white/5 p-5 sm:p-8 rounded-[1.9rem] sm:rounded-[2.4rem] space-y-8">
                     {/* Verdict + demand */}
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-3">
                       <div>
-                        <h3 className="text-2xl font-black text-white uppercase tracking-tighter">
+                        <h3 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tighter">
                           {VERDICT_EMOJI[result.verdict] || "📦"} {result.verdict}
                         </h3>
                         <p className="text-[10px] font-black text-white/40 uppercase tracking-widest mt-1">
@@ -518,41 +518,41 @@ Rules:
                     </div>
 
                     {/* Price range */}
-                    <div className="flex items-end justify-between gap-4">
+                    <div className="flex items-end justify-between gap-2 sm:gap-4">
                       {[
                         { label: "Conservative", val: result.low, color: "text-blue-400" },
                         { label: "Realistic", val: result.mid, color: "text-resale-gold", big: true },
                         { label: "Optimistic", val: result.high, color: "text-emerald-400" },
                       ].map(({ label, val, color, big }) => (
                         <div key={label} className="flex-1 text-center">
-                          <div className={cn("font-black font-mono tracking-tighter leading-none", color, big ? "text-6xl" : "text-3xl")}>${val}</div>
+                          <div className={cn("font-black font-mono tracking-tighter leading-none", color, big ? "text-4xl sm:text-6xl" : "text-xl sm:text-3xl")}>${val}</div>
                           <div className="text-[9px] font-black text-white/30 uppercase tracking-widest mt-2">{label}</div>
                         </div>
                       ))}
                     </div>
 
                     {/* Profit metrics */}
-                    <div className="grid grid-cols-3 gap-4 pt-6 border-t border-white/10">
+                    <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-6 border-t border-white/10">
                       <div className="text-center">
-                        <p className={cn("text-3xl font-black font-mono", profitMid >= 0 ? "text-emerald-400" : "text-red-400")}>
+                        <p className={cn("text-xl sm:text-3xl font-black font-mono", profitMid >= 0 ? "text-emerald-400" : "text-red-400")}>
                           ${profitMid}
                         </p>
                         <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mt-1">Net Profit</p>
                       </div>
                       <div className="text-center">
-                        <p className={cn("text-3xl font-black font-mono", profitMid >= 0 ? "text-emerald-400" : "text-red-400")}>
+                        <p className={cn("text-xl sm:text-3xl font-black font-mono", profitMid >= 0 ? "text-emerald-400" : "text-red-400")}>
                           {roiMid}%
                         </p>
                         <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mt-1">ROI</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-3xl font-black font-mono text-resale-gold">${result.paid}</p>
+                        <p className="text-xl sm:text-3xl font-black font-mono text-resale-gold">${result.paid}</p>
                         <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mt-1">You Paid</p>
                       </div>
                     </div>
 
                     {/* Listing tip */}
-                    <div className="bg-white/5 border border-white/10 rounded-3xl p-6 space-y-2">
+                    <div className="bg-white/5 border border-white/10 rounded-3xl p-5 sm:p-6 space-y-2">
                       <div className="flex items-center gap-2">
                         <Zap className="w-4 h-4 text-resale-gold fill-resale-gold" />
                         <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Listing Tip</span>
@@ -564,14 +564,14 @@ Rules:
 
                 {/* Best platform callout */}
                 {best && (
-                  <div className="bg-white/60 backdrop-blur-xl border border-espresso-brown/10 rounded-4xl p-6 shadow-xl flex items-center justify-between gap-6">
+                  <div className="bg-white/60 backdrop-blur-xl border border-espresso-brown/10 rounded-4xl p-5 sm:p-6 shadow-xl flex items-center justify-between gap-4 sm:gap-6">
                     <div>
                       <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-2">🏆 Best Platform</p>
                       <h4 className="text-xl font-black uppercase tracking-tighter text-espresso-brown">{best.name}</h4>
                       <p className="text-xs font-bold text-espresso-brown/50 mt-1 max-w-xs">{best.reason}</p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-4xl font-black font-mono text-emerald-600 tracking-tighter">${best.net_profit}</p>
+                      <p className="text-3xl sm:text-4xl font-black font-mono text-emerald-600 tracking-tighter">${best.net_profit}</p>
                       <p className="text-[10px] font-black text-resale-gold uppercase tracking-widest mt-1">{best.roi}% ROI</p>
                     </div>
                   </div>
@@ -591,15 +591,15 @@ Rules:
                   <div
                     key={p.name}
                     className={cn(
-                      "border rounded-4xl p-6 shadow-xl relative overflow-hidden",
+                      "border rounded-4xl p-5 sm:p-6 shadow-xl relative overflow-hidden",
                       i === 0
                         ? "bg-espresso-brown border-transparent"
                         : "bg-white/60 backdrop-blur-xl border-espresso-brown/10"
                     )}
                   >
-                    <div className="flex items-start justify-between gap-6">
+                    <div className="flex items-start justify-between gap-4 sm:gap-6">
                       <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-3">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3">
                           {i === 0 && (
                             <span className="text-[9px] font-black bg-resale-gold text-espresso-brown px-3 py-1 rounded-full uppercase tracking-widest">
                               Top Pick
@@ -612,7 +612,7 @@ Rules:
                         <p className={cn("text-xs font-bold leading-relaxed mb-4", i === 0 ? "text-white/60" : "text-espresso-brown/50")}>
                           {p.reason}
                         </p>
-                        <div className="flex items-center gap-4">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                           <span className={cn("text-[9px] font-black px-3 py-1 rounded-full border uppercase tracking-widest", i === 0 ? "border-white/20 text-white/60" : FIT_STYLES[p.fit])}>
                             Fit: {p.fit}
                           </span>
@@ -622,7 +622,7 @@ Rules:
                         </div>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className={cn("text-3xl font-black font-mono tracking-tighter", p.net_profit >= 0 ? (i === 0 ? "text-emerald-400" : "text-emerald-600") : "text-red-500")}>
+                        <p className={cn("text-2xl sm:text-3xl font-black font-mono tracking-tighter", p.net_profit >= 0 ? (i === 0 ? "text-emerald-400" : "text-emerald-600") : "text-red-500")}>
                           ${p.net_profit}
                         </p>
                         <p className={cn("text-[9px] font-black uppercase tracking-widest", i === 0 ? "text-white/30" : "text-espresso-brown/30")}>

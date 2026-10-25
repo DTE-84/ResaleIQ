@@ -69,6 +69,14 @@ const PLATFORMS = {
 	ebay: { name: "eBay (Pro)", sellerFee: 13.25, accent: "#0064D2", logo: "E" },
 };
 
+const TABS = [
+	{ id: "generate", label: "Generate", icon: Sparkles },
+	{ id: "profit", label: "Profit", icon: Calculator },
+	{ id: "inventory", label: "Vault", icon: Package },
+	{ id: "pricer", label: "Pricer", icon: Tag },
+	{ id: "visual", label: "Visual", icon: Camera, premium: true },
+];
+
 const CONDITIONS = ["New with tags", "Like new", "Good", "Fair", "Poor"];
 
 const CATEGORIES = [
@@ -324,7 +332,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 				/>
 			</div>
 
-			<div className='relative z-10 max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 py-5 sm:py-8'>
+			<div className='relative z-10 max-w-7xl mx-auto px-4 sm:px-5 lg:px-8 pt-safe sm:pt-8 pb-28 md:pb-8'>
 			{/* HEADER */}
 			<header className='flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-5 mb-6 sm:mb-10'>
 
@@ -362,29 +370,23 @@ Return ONLY valid JSON, no markdown, no backticks:
 					</div>
 				</div>
 
-				{/* ROW 2: Nav tabs + Desktop user */}
-				<div className='flex flex-col md:flex-row items-stretch md:items-center gap-3 sm:gap-5 w-full md:w-auto'>
+				{/* ROW 2: Nav tabs + Desktop user (mobile uses the bottom tab bar) */}
+				<div className='hidden md:flex flex-row items-center gap-3 w-auto'>
 					{/* Nav Pill */}
-					<div className='flex items-center gap-1 p-1 bg-espresso-brown/5 rounded-xl sm:rounded-2xl border border-espresso-brown/5 w-full md:w-auto overflow-x-auto scrollbar-hide'>
-						{[
-							{ id: "generate", label: "Generate", icon: Sparkles },
-							{ id: "profit", label: "Profit", icon: Calculator },
-							{ id: "inventory", label: "The Vault", icon: Package },
-							{ id: "pricer", label: "Flip Pricer", icon: Tag },
-							{ id: "visual", label: "Visual V3", icon: Camera, premium: true },
-						].map((t) => (
+					<div className='flex items-center gap-1 p-1 bg-espresso-brown/5 rounded-2xl border border-espresso-brown/5'>
+						{TABS.map((t) => (
 							<button
 								key={t.id}
 								onClick={() => setTab(t.id)}
 								className={cn(
-									"flex-1 md:flex-none flex items-center justify-center gap-1.5 px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest transition-all whitespace-nowrap",
+									"flex items-center justify-center gap-1.5 px-4 lg:px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap",
 									tab === t.id
 										? "bg-white text-espresso-brown shadow-md border border-espresso-brown/5 scale-105"
 										: "text-espresso-brown/40 hover:text-espresso-brown/60",
 								)}>
 								<t.icon
 									className={cn(
-										"w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0",
+										"w-3.5 h-3.5 shrink-0",
 										tab === t.id ? "text-cobalt-pulse" : "text-current",
 									)}
 								/>
@@ -393,7 +395,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 									<Crown className="w-3 h-3 text-resale-gold ml-0.5" />
 								)}
 								{t.id === "inventory" && inv.total > 0 && (
-									<span className='bg-cobalt-pulse text-white text-[7px] sm:text-[8px] px-1 sm:px-1.5 py-0.5 rounded-full'>
+									<span className='bg-cobalt-pulse text-white text-[8px] px-1.5 py-0.5 rounded-full'>
 										{inv.total}
 									</span>
 								)}
@@ -402,7 +404,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 					</div>
 
 					{/* Upgrade Button */}
-					<button className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-resale-gold to-yellow-600 text-white shadow-lg shadow-resale-gold/20 hover:scale-105 transition-transform text-[10px] font-black uppercase tracking-widest ml-auto">
+					<button className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-resale-gold to-yellow-600 text-white shadow-lg shadow-resale-gold/20 hover:scale-105 transition-transform text-[10px] font-black uppercase tracking-widest whitespace-nowrap ml-auto">
 						<Crown className="w-3.5 h-3.5" />
 						Upgrade Pro
 					</button>
@@ -441,13 +443,13 @@ Return ONLY valid JSON, no markdown, no backticks:
 								initial={{ opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: -20 }}
-								className='grid lg:grid-cols-12 gap-8'>
+								className='grid lg:grid-cols-12 gap-6 sm:gap-8'>
 								{/* INPUT FORM (COL-5) */}
 								<div className='lg:col-span-5 space-y-8'>
-									<section className='bg-white/60 backdrop-blur-xl border border-espresso-brown/10 rounded-5xl p-8 shadow-2xl relative overflow-hidden group'>
+									<section className='bg-white/60 backdrop-blur-xl border border-espresso-brown/10 rounded-4xl sm:rounded-5xl p-5 sm:p-8 shadow-2xl relative overflow-hidden group'>
 										<div className='absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cobalt-pulse/20 to-transparent' />
 
-										<div className='flex items-center justify-between mb-8'>
+										<div className='flex items-center justify-between mb-6 sm:mb-8'>
 											<h2 className='text-lg font-black uppercase tracking-widest text-espresso-brown/80 flex items-center gap-3'>
 												<Plus className='w-5 h-5 text-cobalt-pulse' />
 												Item Variables
@@ -470,7 +472,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 																key={k}
 																onClick={() => setPlatform(k)}
 																className={cn(
-																	"flex flex-col items-center justify-center p-4 rounded-3xl border transition-all duration-300 gap-2",
+																	"flex flex-col items-center justify-center p-3 sm:p-4 rounded-2xl sm:rounded-3xl border transition-all duration-300 gap-2",
 																	platform === k
 																		? "bg-white border-espresso-brown/20 shadow-xl scale-105 z-10"
 																		: "bg-espresso-brown/[0.02] border-transparent grayscale hover:grayscale-0 hover:bg-white/40",
@@ -495,7 +497,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 											</div>
 
 											{/* Inputs */}
-											<div className='grid grid-cols-2 gap-4'>
+											<div className='grid sm:grid-cols-2 gap-4'>
 												<div className='space-y-2'>
 													<label className='text-[10px] font-black text-espresso-brown/40 uppercase tracking-widest block pl-1'>
 														Brand
@@ -506,7 +508,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 															setForm({ ...form, brand: e.target.value })
 														}
 														placeholder='Nike, Zara...'
-														className='w-full bg-white border border-espresso-brown/10 rounded-2xl p-4 text-sm font-bold focus:outline-none focus:border-cobalt-pulse/30 transition-all'
+														className='w-full bg-white border border-espresso-brown/10 rounded-2xl p-3 sm:p-4 text-sm font-bold focus:outline-none focus:border-cobalt-pulse/30 transition-all'
 													/>
 												</div>
 												<div className='space-y-2'>
@@ -518,7 +520,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 														onChange={(e) =>
 															setForm({ ...form, category: e.target.value })
 														}
-														className='w-full bg-white border border-espresso-brown/10 rounded-2xl p-4 text-sm font-bold focus:outline-none focus:border-cobalt-pulse/30 transition-all appearance-none cursor-pointer'>
+														className='w-full bg-white border border-espresso-brown/10 rounded-2xl p-3 sm:p-4 text-sm font-bold focus:outline-none focus:border-cobalt-pulse/30 transition-all appearance-none cursor-pointer'>
 														{CATEGORIES.map((c) => (
 															<option key={c} value={c}>
 																{c}
@@ -538,7 +540,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 															key={c}
 															onClick={() => setForm({ ...form, condition: c })}
 															className={cn(
-																"px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all",
+																"px-4 py-2.5 sm:py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all",
 																form.condition === c
 																	? "bg-espresso-brown text-white shadow-lg"
 																	: "bg-espresso-brown/5 text-espresso-brown/40 hover:bg-espresso-brown/10",
@@ -549,7 +551,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 												</div>
 											</div>
 
-											<div className='grid grid-cols-3 gap-4'>
+											<div className='grid grid-cols-3 gap-2 sm:gap-4'>
 												<div className='space-y-2'>
 													<label className='text-[10px] font-black text-espresso-brown/40 uppercase tracking-widest block pl-1'>
 														Color
@@ -560,7 +562,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 															setForm({ ...form, color: e.target.value })
 														}
 														placeholder='Cream'
-														className='w-full bg-white border border-espresso-brown/10 rounded-2xl p-4 text-sm font-bold focus:outline-none focus:border-cobalt-pulse/30 transition-all'
+														className='w-full bg-white border border-espresso-brown/10 rounded-2xl p-3 sm:p-4 text-sm font-bold focus:outline-none focus:border-cobalt-pulse/30 transition-all'
 													/>
 												</div>
 												<div className='space-y-2'>
@@ -573,7 +575,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 															setForm({ ...form, size: e.target.value })
 														}
 														placeholder='L'
-														className='w-full bg-white border border-espresso-brown/10 rounded-2xl p-4 text-sm font-bold focus:outline-none focus:border-cobalt-pulse/30 transition-all'
+														className='w-full bg-white border border-espresso-brown/10 rounded-2xl p-3 sm:p-4 text-sm font-bold focus:outline-none focus:border-cobalt-pulse/30 transition-all'
 													/>
 												</div>
 												<div className='space-y-2'>
@@ -590,7 +592,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 															})
 														}
 														placeholder='0.00'
-														className='w-full bg-white border border-espresso-brown/10 rounded-2xl p-4 text-sm font-bold focus:outline-none focus:border-cobalt-pulse/30 transition-all'
+														className='w-full bg-white border border-espresso-brown/10 rounded-2xl p-3 sm:p-4 text-sm font-bold focus:outline-none focus:border-cobalt-pulse/30 transition-all'
 													/>
 												</div>
 											</div>
@@ -606,7 +608,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 													}
 													placeholder='Retail price, defects, styling...'
 													rows={3}
-													className='w-full bg-white border border-espresso-brown/10 rounded-2xl p-4 text-sm font-bold focus:outline-none focus:border-cobalt-pulse/30 transition-all resize-none'
+													className='w-full bg-white border border-espresso-brown/10 rounded-2xl p-3 sm:p-4 text-sm font-bold focus:outline-none focus:border-cobalt-pulse/30 transition-all resize-none'
 												/>
 											</div>
 
@@ -637,7 +639,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 										<motion.div
 											initial={{ opacity: 0, scale: 0.95 }}
 											animate={{ opacity: 1, scale: 1 }}
-											className='bg-white/40 backdrop-blur-xl border border-espresso-brown/5 rounded-5xl p-16 text-center shadow-2xl relative overflow-hidden'>
+											className='bg-white/40 backdrop-blur-xl border border-espresso-brown/5 rounded-4xl sm:rounded-5xl p-10 sm:p-16 text-center shadow-2xl relative overflow-hidden'>
 											<div className='absolute inset-0 z-0'>
 												<div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-cobalt-pulse/5 rounded-full blur-[100px] animate-pulse' />
 											</div>
@@ -673,7 +675,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 									)}
 
 									{genError && !generating && (
-										<div className='bg-red-500/5 border border-red-500/20 rounded-4xl p-8 flex items-center gap-4 text-red-600'>
+										<div className='bg-red-500/5 border border-red-500/20 rounded-4xl p-5 sm:p-8 flex items-center gap-4 text-red-600'>
 											<ShieldCheck className='w-8 h-8 shrink-0' />
 											<div>
 												<p className='font-black uppercase text-xs tracking-widest'>
@@ -692,9 +694,9 @@ Return ONLY valid JSON, no markdown, no backticks:
 											animate={{ opacity: 1, x: 0 }}
 											className='space-y-6'>
 											{/* Metric Row */}
-											<div className='grid grid-cols-2 gap-4'>
-												<div className='bg-white/80 backdrop-blur-xl border border-espresso-brown/10 rounded-4xl p-6 shadow-xl flex items-center gap-6'>
-													<div className='relative w-20 h-20 flex items-center justify-center'>
+											<div className='grid sm:grid-cols-2 gap-4'>
+												<div className='bg-white/80 backdrop-blur-xl border border-espresso-brown/10 rounded-4xl p-5 sm:p-6 shadow-xl flex items-center gap-5 sm:gap-6'>
+													<div className='relative w-20 h-20 shrink-0 flex items-center justify-center'>
 														<svg className='w-full h-full -rotate-90'>
 															<circle
 																cx='40'
@@ -744,7 +746,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 													</div>
 												</div>
 
-												<div className='bg-white/80 backdrop-blur-xl border border-espresso-brown/10 rounded-4xl p-6 shadow-xl flex flex-col justify-center gap-1'>
+												<div className='bg-white/80 backdrop-blur-xl border border-espresso-brown/10 rounded-4xl p-5 sm:p-6 shadow-xl flex flex-col justify-center gap-1'>
 													<p className='text-[10px] font-black text-espresso-brown/40 uppercase tracking-widest leading-none'>
 														Suggested Entry
 													</p>
@@ -771,8 +773,8 @@ Return ONLY valid JSON, no markdown, no backticks:
 											</div>
 
 											{/* Result Terminal */}
-											<section className='bg-espresso-brown rounded-5xl p-1 border border-white/5 shadow-[0_40px_100px_rgba(0,0,0,0.4)] relative overflow-hidden'>
-												<div className='bg-white/5 p-8 rounded-[2.4rem] space-y-10'>
+											<section className='bg-espresso-brown rounded-4xl sm:rounded-5xl p-1 border border-white/5 shadow-[0_40px_100px_rgba(0,0,0,0.4)] relative overflow-hidden'>
+												<div className='bg-white/5 p-5 sm:p-8 rounded-[1.9rem] sm:rounded-[2.4rem] space-y-8 sm:space-y-10'>
 													{/* SEO Title */}
 													<div className='space-y-4'>
 														<div className='flex items-center justify-between'>
@@ -801,7 +803,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 																</button>
 															</div>
 														</div>
-														<h3 className='text-2xl font-black text-white leading-tight uppercase tracking-tighter'>
+														<h3 className='text-xl sm:text-2xl font-black text-white leading-tight uppercase tracking-tighter break-words'>
 															{listing.title}
 														</h3>
 													</div>
@@ -848,7 +850,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 													</div>
 
 													{/* Tips Grid */}
-													<div className='grid grid-cols-2 gap-4 pt-6 border-t border-white/10'>
+													<div className='grid sm:grid-cols-2 gap-4 pt-6 border-t border-white/10'>
 														{listing.tips.map((tip, i) => (
 															<div key={i} className='flex gap-3'>
 																<span className='text-[10px] font-black text-resale-gold flex-shrink-0'>
@@ -862,10 +864,10 @@ Return ONLY valid JSON, no markdown, no backticks:
 													</div>
 
 													{/* Terminal Footer */}
-													<div className='flex items-center gap-4 pt-6'>
+													<div className='flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-6'>
 														<button
 															onClick={addToInv}
-															className='flex-1 bg-white/10 hover:bg-white/20 text-white border border-white/10 py-5 rounded-3xl font-black uppercase text-[10px] tracking-widest transition-all flex items-center justify-center gap-3'>
+															className='sm:flex-1 bg-white/10 hover:bg-white/20 text-white border border-white/10 py-5 rounded-3xl font-black uppercase text-[10px] tracking-widest transition-all flex items-center justify-center gap-3'>
 															<Plus className='w-4 h-4' />
 															Archive to Vault
 														</button>
@@ -876,7 +878,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 																	"full",
 																)
 															}
-															className='flex-[1.5] bg-resale-gold text-espresso-brown py-5 rounded-3xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-resale-gold/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3'>
+															className='sm:flex-[1.5] bg-resale-gold text-espresso-brown py-5 rounded-3xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-resale-gold/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3'>
 															{copied === "full" ? (
 																<Check className='w-4 h-4' />
 															) : (
@@ -893,7 +895,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 									)}
 
 									{!listing && !generating && !genError && (
-										<div className='h-full flex flex-col items-center justify-center p-12 text-center space-y-6'>
+										<div className='h-full flex flex-col items-center justify-center p-8 sm:p-12 text-center space-y-6'>
 											<div className='w-32 h-32 bg-espresso-brown/[0.03] border-2 border-dashed border-espresso-brown/10 rounded-full flex items-center justify-center relative'>
 												<motion.div
 													animate={{ rotate: 360 }}
@@ -928,21 +930,21 @@ Return ONLY valid JSON, no markdown, no backticks:
 								initial={{ opacity: 0, scale: 0.95 }}
 								animate={{ opacity: 1, scale: 1 }}
 								className='max-w-2xl mx-auto'>
-								<section className='bg-white/60 backdrop-blur-xl border border-espresso-brown/10 rounded-5xl p-10 shadow-2xl space-y-10 relative overflow-hidden'>
+								<section className='bg-white/60 backdrop-blur-xl border border-espresso-brown/10 rounded-4xl sm:rounded-5xl p-6 sm:p-10 shadow-2xl space-y-8 sm:space-y-10 relative overflow-hidden'>
 									<div className='absolute top-0 right-0 p-12 opacity-[0.03]'>
 										<Calculator size={300} className='text-espresso-brown' />
 									</div>
 
 									<div className='space-y-2'>
-										<h2 className='text-3xl font-black uppercase tracking-tighter text-espresso-brown'>
+										<h2 className='text-2xl sm:text-3xl font-black uppercase tracking-tighter text-espresso-brown'>
 											Capital Projection
 										</h2>
-										<p className='text-[10px] font-black text-espresso-brown/40 uppercase tracking-[0.4em] leading-none pl-1'>
+										<p className='text-[10px] font-black text-espresso-brown/40 uppercase tracking-[0.25em] sm:tracking-[0.4em] leading-snug pl-1'>
 											Determining unit velocity & net yield
 										</p>
 									</div>
 
-									<div className='grid sm:grid-cols-2 gap-10'>
+									<div className='grid sm:grid-cols-2 gap-6 sm:gap-10'>
 										<div className='space-y-6'>
 											{[
 												{ label: "Sale Price", key: "salePrice" },
@@ -971,7 +973,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 											))}
 										</div>
 
-										<div className='bg-espresso-brown rounded-4xl p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden group'>
+										<div className='bg-espresso-brown rounded-4xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden group'>
 											<div className='absolute inset-0 bg-gradient-to-br from-cobalt-pulse/10 to-transparent' />
 
 											<div className='space-y-6 relative z-10'>
@@ -992,7 +994,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 															</p>
 															<h4
 																className={cn(
-																	"text-6xl font-black font-display tracking-tighter",
+																	"text-5xl sm:text-6xl font-black font-display tracking-tighter break-all",
 																	net >= 0
 																		? "text-emerald-400"
 																		: "text-red-400",
@@ -1000,7 +1002,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 																${net.toFixed(2)}
 															</h4>
 														</div>
-														<div className='grid grid-cols-2 gap-4'>
+														<div className='grid sm:grid-cols-2 gap-4'>
 															<div className='bg-white/5 rounded-2xl p-4 border border-white/5 text-center'>
 																<p className='text-[8px] font-black text-white/20 uppercase tracking-widest mb-1'>
 																	ROI
@@ -1086,7 +1088,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 									].map((s, i) => (
 										<div
 											key={i}
-											className='bg-white border border-espresso-brown/10 rounded-3xl p-6 shadow-xl space-y-3 relative overflow-hidden group'>
+											className='bg-white border border-espresso-brown/10 rounded-3xl p-4 sm:p-6 shadow-xl space-y-3 relative overflow-hidden group'>
 											<div className='absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity'>
 												<s.icon size={60} className='text-espresso-brown' />
 											</div>
@@ -1095,7 +1097,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 											</p>
 											<h4
 												className={cn(
-													"text-2xl font-black font-display tracking-tighter leading-none",
+													"text-xl sm:text-2xl font-black font-display tracking-tighter leading-none",
 													s.color || "text-espresso-brown",
 												)}>
 												{s.val}
@@ -1110,7 +1112,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 										<RefreshCcw className='w-8 h-8 animate-spin text-espresso-brown/20' />
 									</div>
 								) : inventory.length === 0 ? (
-									<div className='bg-white/40 backdrop-blur-xl border border-dashed border-espresso-brown/20 rounded-5xl p-20 text-center space-y-6'>
+									<div className='bg-white/40 backdrop-blur-xl border border-dashed border-espresso-brown/20 rounded-4xl sm:rounded-5xl p-8 sm:p-20 text-center space-y-6'>
 										<div className='w-24 h-24 bg-espresso-brown rounded-[2.5rem] flex items-center justify-center mx-auto shadow-2xl opacity-10'>
 											<Package className='w-12 h-12 text-white' />
 										</div>
@@ -1130,15 +1132,15 @@ Return ONLY valid JSON, no markdown, no backticks:
 										</button>
 									</div>
 								) : (
-									<div className='grid md:grid-cols-2 lg:grid-cols-3 gap-6'>
+									<div className='grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6'>
 										{inventory.map((item) => (
 											<motion.div
 												key={item.id}
 												layout
 												initial={{ opacity: 0, scale: 0.9 }}
 												animate={{ opacity: 1, scale: 1 }}
-												className='bg-white border border-espresso-brown/10 rounded-4xl p-6 shadow-xl relative overflow-hidden group hover:border-resale-gold/40 transition-all duration-500'>
-												<div className='flex justify-between items-start mb-6'>
+												className='bg-white border border-espresso-brown/10 rounded-4xl p-5 sm:p-6 shadow-xl relative overflow-hidden group hover:border-resale-gold/40 transition-all duration-500'>
+												<div className='flex justify-between items-start gap-3 mb-6'>
 													<div className='space-y-1'>
 														<div className='flex items-center gap-2'>
 															<span className='text-[10px] font-black text-resale-gold uppercase tracking-widest'>
@@ -1186,7 +1188,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 																key={s.id}
 																onClick={() => setStatus(item.id, s.id)}
 																className={cn(
-																	"w-9 h-9 rounded-xl flex items-center justify-center transition-all",
+																	"w-10 h-10 rounded-xl flex items-center justify-center transition-all",
 																	item.status === s.id
 																		? s.id === "sold"
 																			? "bg-emerald-400 text-white"
@@ -1201,7 +1203,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 													</div>
 													<button
 														onClick={() => removeItem(item.id)}
-														className='w-9 h-9 rounded-xl flex items-center justify-center text-espresso-brown/10 hover:text-red-400 transition-colors'>
+														className='w-10 h-10 rounded-xl flex items-center justify-center text-espresso-brown/20 hover:text-red-400 transition-colors'>
 														<Trash2 className='w-4 h-4' />
 													</button>
 												</div>
@@ -1243,7 +1245,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 									</div>
 
 									{!visualImage ? (
-										<div className="border-2 border-dashed border-espresso-brown/20 rounded-2xl p-12 text-center hover:bg-espresso-brown/5 transition-colors cursor-pointer relative">
+										<div className="border-2 border-dashed border-espresso-brown/20 rounded-2xl p-10 sm:p-12 text-center hover:bg-espresso-brown/5 transition-colors cursor-pointer relative">
 											<input 
 												type="file" 
 												accept="image/*" 
@@ -1320,8 +1322,8 @@ Return ONLY valid JSON, no markdown, no backticks:
 				</main>
 
 				{/* FOOTER */}
-				<footer className='mt-20 pt-8 border-t border-espresso-brown/5 flex flex-col items-center gap-6'>
-					<div className='flex items-center gap-6'>
+				<footer className='mt-12 sm:mt-20 pt-8 border-t border-espresso-brown/5 flex flex-col items-center gap-6'>
+					<div className='flex flex-wrap items-center justify-center gap-x-6 gap-y-3'>
 						<a
 							href='https://dte-solutions.icu'
 							className='text-[10px] font-black uppercase tracking-[0.3em] text-espresso-brown/20 hover:text-cobalt-pulse transition-colors'>
@@ -1341,7 +1343,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 						</a>
 					</div>
 					<div className='text-center space-y-1'>
-						<p className='text-[9px] font-mono uppercase tracking-[0.5em] text-espresso-brown/10'>
+						<p className='text-[9px] font-mono uppercase tracking-[0.3em] sm:tracking-[0.5em] text-espresso-brown/10'>
 							© 2026 ResaleIQ // Boutique Intelligence Division
 						</p>
 						<p className='text-[8px] font-black uppercase tracking-[0.2em] text-espresso-brown/5'>
@@ -1350,6 +1352,46 @@ Return ONLY valid JSON, no markdown, no backticks:
 					</div>
 				</footer>
 			</div>
+
+			{/* MOBILE TAB BAR */}
+			<nav className='md:hidden fixed bottom-0 inset-x-0 z-50 bg-boutique-creame/90 backdrop-blur-xl border-t border-espresso-brown/10 pb-safe'>
+				<div className='grid grid-cols-5 px-1 pt-1.5'>
+					{TABS.map((t) => (
+						<button
+							key={t.id}
+							onClick={() => {
+								setTab(t.id);
+								window.scrollTo({ top: 0 });
+							}}
+							className={cn(
+								"relative flex flex-col items-center justify-center gap-1 min-h-[52px] rounded-xl text-[10px] font-black uppercase tracking-wide transition-colors",
+								tab === t.id ? "text-espresso-brown" : "text-espresso-brown/40",
+							)}>
+							<div
+								className={cn(
+									"relative flex items-center justify-center w-12 h-7 rounded-full transition-colors",
+									tab === t.id && "bg-espresso-brown/[0.07]",
+								)}>
+								<t.icon
+									className={cn(
+										"w-5 h-5",
+										tab === t.id && "text-cobalt-pulse",
+									)}
+								/>
+								{t.premium && (
+									<Crown className='absolute -top-1 right-1 w-3 h-3 text-resale-gold' />
+								)}
+								{t.id === "inventory" && inv.total > 0 && (
+									<span className='absolute -top-1 right-0.5 bg-cobalt-pulse text-white text-[8px] leading-none px-1.5 py-0.5 rounded-full'>
+										{inv.total}
+									</span>
+								)}
+							</div>
+							{t.label}
+						</button>
+					))}
+				</div>
+			</nav>
 		</div>
 	);
 }

@@ -3,8 +3,21 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
   body {
     @apply bg-boutique-creame text-espresso-brown font-sans;
+    overscroll-behavior-y: none;
+  }
+  /* iOS Safari zooms into any focused field under 16px */
+  @media (max-width: 639px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
   }
 }
 
@@ -14,5 +27,21 @@
   }
   .btn-kinetic {
     @apply transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:scale-100;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .pt-safe {
+    padding-top: max(1.25rem, env(safe-area-inset-top));
+  }
+  .pb-safe {
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
   }
 }
