@@ -26,3 +26,8 @@ dist-ssr
 # Environment
 .env
 .env.production
+.env.*
+!.env.example
+
+.vercel
+.env*

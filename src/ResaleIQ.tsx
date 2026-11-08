@@ -115,6 +115,10 @@ export default function ResaleIQ() {
 	const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
+		if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+			setVisualError('Use a JPEG, PNG, or WebP photo up to 5 MB.');
+			return;
+		}
 
 		const reader = new FileReader();
 		reader.onload = async (e) => {
@@ -1241,21 +1245,24 @@ Return ONLY valid JSON, no markdown, no backticks:
 											<Camera className="w-8 h-8 text-espresso-brown/60" />
 										</div>
 										<h2 className="text-2xl font-display font-black text-espresso-brown tracking-tight">Visual Scanner</h2>
-										<p className="text-espresso-brown/60 text-sm mt-2">Powered by Claude 3.5 Sonnet & Market Truth Protocol</p>
+										<p className="text-espresso-brown/60 text-sm mt-2">AI item identification. Review details before listing.</p>
 									</div>
 
+									{visualError && !visualImage && (
+										<div role="alert" className="p-4 mb-4 bg-red-50 text-red-600 rounded-xl text-sm">{visualError}</div>
+									)}
 									{!visualImage ? (
 										<div className="border-2 border-dashed border-espresso-brown/20 rounded-2xl p-10 sm:p-12 text-center hover:bg-espresso-brown/5 transition-colors cursor-pointer relative">
 											<input 
 												type="file" 
-												accept="image/*" 
+												accept="image/jpeg,image/png,image/webp"
 												capture="environment"
 												onChange={handleImageUpload}
 												className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
 											/>
 											<Camera className="w-10 h-10 text-espresso-brown/30 mx-auto mb-4" />
 											<p className="text-espresso-brown font-bold mb-1">Tap to Scan Item</p>
-											<p className="text-espresso-brown/50 text-sm">Upload or take a photo</p>
+											<p className="text-espresso-brown/50 text-sm">JPEG, PNG, or WebP up to 5 MB</p>
 										</div>
 									) : (
 										<div className="space-y-6">
@@ -1264,7 +1271,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 												{visualProcessing && (
 													<div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex flex-col items-center justify-center">
 														<RefreshCcw className="w-8 h-8 text-espresso-brown animate-spin mb-4" />
-														<p className="text-espresso-brown font-bold tracking-widest text-xs uppercase">Analyzing via Claude 3.5...</p>
+														<p className="text-espresso-brown font-bold tracking-widest text-xs uppercase">Identifying item...</p>
 													</div>
 												)}
 											</div>
@@ -1285,20 +1292,20 @@ Return ONLY valid JSON, no markdown, no backticks:
 														<p className="text-espresso-brown/70 text-sm">Brand: {visualResult.identification.brand} | Model: {visualResult.identification.model}</p>
 													</div>
 
-													<div className="bg-gradient-to-br from-emerald-500/10 to-teal-600/10 p-6 rounded-2xl border border-emerald-500/20">
+													<div className="bg-espresso-brown/5 p-6 rounded-2xl border border-espresso-brown/10">
 														<div className="flex justify-between items-start mb-4">
 															<div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-emerald-700">
 																<TrendingUp className="w-3 h-3" /> Valuation
 															</div>
 															<span className="text-[10px] font-bold bg-white/50 text-emerald-800 px-2 py-1 rounded-md uppercase tracking-wider">
-																{visualResult.valuation.source}
+																Unavailable
 															</span>
 														</div>
 														<div className="flex items-end gap-3">
 															<span className="text-4xl font-black text-emerald-600 tracking-tight">
-																${visualResult.valuation.averagePrice.toFixed(2)}
+																—
 															</span>
-															<span className="text-emerald-700/60 font-bold mb-1">Avg. Market Value</span>
+															<span className="text-espresso-brown/60 text-sm mb-1">Verified marketplace pricing is not connected yet.</span>
 														</div>
 													</div>
 													
