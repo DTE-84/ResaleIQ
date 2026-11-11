@@ -7,6 +7,7 @@ import ResaleIQ from "../ResaleIQ";
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [recovering, setRecovering] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -16,7 +17,9 @@ export default function App() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN") setSession(session);
-      if (event === "SIGNED_OUT") setSession(null);
+      if (event === "SIGNED_OUT") { setSession(null); setRecovering(false); }
+      // Reset-password email links sign the user in with a recovery session
+      if (event === "PASSWORD_RECOVERY") { setSession(session); setRecovering(true); }
       setLoading(false);
     });
 
@@ -29,6 +32,7 @@ export default function App() {
     </div>
   );
 
+  if (recovering) return <Auth recovery onRecovered={() => setRecovering(false)} />;
   if (!session) return <Auth />;
   return <ResaleIQ />;
 }

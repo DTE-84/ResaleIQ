@@ -29,7 +29,7 @@ export default defineConfig({
         // App shell only — Supabase/API calls always go to the network
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         globIgnores: ['resaleiq.png'],
-        navigateFallbackDenylist: [/^\/api\//, /^\/breakdown\.html/],
+        navigateFallbackDenylist: [/^\/api\//, /^\/(breakdown|privacy|terms)\.html/],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/i,

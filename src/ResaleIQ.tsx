@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "./lib/supabase";
 import {
@@ -20,11 +20,11 @@ import {
 	LogOut,
 	User as UserIcon,
 	Camera,
-	Crown,
 } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import FlipPricer from "./components/FlipPricer";
+import { AccountSheet, AiConsentDialog } from "./components/AccountPanels";
 
 function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -66,7 +66,7 @@ const PLATFORMS = {
 	mercari: { name: "Mercari", sellerFee: 10, accent: "#2DCC70", logo: "M" },
 	offerup: { name: "OfferUp", sellerFee: 12.9, accent: "#FF7B00", logo: "O" },
 	facebook: { name: "FB", sellerFee: 5, accent: "#1877F2", logo: "F" },
-	ebay: { name: "eBay (Pro)", sellerFee: 13.25, accent: "#0064D2", logo: "E" },
+	ebay: { name: "eBay", sellerFee: 13.25, accent: "#0064D2", logo: "E" },
 };
 
 const TABS = [
@@ -74,7 +74,7 @@ const TABS = [
 	{ id: "profit", label: "Profit", icon: Calculator },
 	{ id: "inventory", label: "Vault", icon: Package },
 	{ id: "pricer", label: "Pricer", icon: Tag },
-	{ id: "visual", label: "Visual", icon: Camera, premium: true },
+	{ id: "visual", label: "Visual", icon: Camera },
 ];
 
 const CONDITIONS = ["New with tags", "Like new", "Good", "Fair", "Poor"];
@@ -105,6 +105,36 @@ export default function ResaleIQ() {
 	const [platform, setPlatform] = useState<Platform>("vinted");
 	const [userEmail, setUserEmail] = useState<string | null>(null);
 	const [userId, setUserId] = useState<string | null>(null);
+	const [accountOpen, setAccountOpen] = useState(false);
+
+	// ── AI data-sharing consent (required before any AI request) ─────────────
+	const [aiConsent, setAiConsent] = useState(false);
+	const [consentOpen, setConsentOpen] = useState(false);
+	const consentResolver = useRef<((allowed: boolean) => void) | null>(null);
+
+	function ensureAiConsent() {
+		if (aiConsent) return Promise.resolve(true);
+		setConsentOpen(true);
+		return new Promise<boolean>((resolve) => {
+			consentResolver.current = resolve;
+		});
+	}
+
+	async function answerConsent(allowed: boolean) {
+		setConsentOpen(false);
+		if (allowed) {
+			setAiConsent(true);
+			await supabase.auth.updateUser({ data: { ai_consent_at: new Date().toISOString() } });
+		}
+		consentResolver.current?.(allowed);
+		consentResolver.current = null;
+	}
+
+	async function toggleAiConsent() {
+		const next = !aiConsent;
+		setAiConsent(next);
+		await supabase.auth.updateUser({ data: { ai_consent_at: next ? new Date().toISOString() : null } });
+	}
 
 	// 📸 Visual V3 📸
 	const [visualImage, setVisualImage] = useState<string | null>(null);
@@ -112,11 +142,16 @@ export default function ResaleIQ() {
 	const [visualResult, setVisualResult] = useState<any>(null);
 	const [visualError, setVisualError] = useState<string | null>(null);
 
-	const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0];
+	const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		const input = e.target;
+		const file = input.files?.[0];
 		if (!file) return;
 		if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
 			setVisualError('Use a JPEG, PNG, or WebP photo up to 5 MB.');
+			return;
+		}
+		if (!(await ensureAiConsent())) {
+			input.value = "";
 			return;
 		}
 
@@ -181,6 +216,7 @@ export default function ResaleIQ() {
 			if (user) {
 				setUserEmail(user.email || null);
 				setUserId(user.id);
+				setAiConsent(Boolean(user.user_metadata?.ai_consent_at));
 				loadInv(user.id);
 			} else {
 				setInvLoaded(true);
@@ -221,6 +257,7 @@ export default function ResaleIQ() {
 	// ── Generate ──────────────────────────────────────────────────────────────
 	async function generate() {
 		if (!form.brand || generating) return;
+		if (!(await ensureAiConsent())) return;
 		setGenerating(true);
 		setListing(null);
 		setGenError(null);
@@ -367,9 +404,10 @@ Return ONLY valid JSON, no markdown, no backticks:
 							</div>
 						</div>
 						<button
-							onClick={handleLogout}
-							className='w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-espresso-brown/5 flex items-center justify-center text-espresso-brown/40 hover:text-red-500 transition-colors'>
-							<LogOut className='w-4 h-4' />
+							onClick={() => setAccountOpen(true)}
+							aria-label='Account'
+							className='w-10 h-10 rounded-xl bg-espresso-brown/5 flex items-center justify-center text-espresso-brown/60 hover:text-espresso-brown transition-colors'>
+							<UserIcon className='w-4 h-4' />
 						</button>
 					</div>
 				</div>
@@ -395,9 +433,6 @@ Return ONLY valid JSON, no markdown, no backticks:
 									)}
 								/>
 								{t.label}
-								{t.premium && (
-									<Crown className="w-3 h-3 text-resale-gold ml-0.5" />
-								)}
 								{t.id === "inventory" && inv.total > 0 && (
 									<span className='bg-cobalt-pulse text-white text-[8px] px-1.5 py-0.5 rounded-full'>
 										{inv.total}
@@ -407,27 +442,23 @@ Return ONLY valid JSON, no markdown, no backticks:
 						))}
 					</div>
 
-					{/* Upgrade Button */}
-					<button className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-resale-gold to-yellow-600 text-white shadow-lg shadow-resale-gold/20 hover:scale-105 transition-transform text-[10px] font-black uppercase tracking-widest whitespace-nowrap ml-auto">
-						<Crown className="w-3.5 h-3.5" />
-						Upgrade Pro
-					</button>
-
 					{/* Desktop User Indicator & Logout */}
-					<div className='hidden md:flex items-center gap-5 pl-5 border-l border-espresso-brown/10'>
-						<div className='flex items-center gap-3'>
+					<div className='hidden md:flex items-center gap-5 pl-5 ml-auto border-l border-espresso-brown/10'>
+						<button
+							onClick={() => setAccountOpen(true)}
+							className='flex items-center gap-3 text-left rounded-xl hover:bg-espresso-brown/5 -m-1.5 p-1.5 transition-colors'>
 							<div className='w-9 h-9 rounded-full bg-cobalt-pulse/10 flex items-center justify-center text-cobalt-pulse border border-cobalt-pulse/20'>
 								<UserIcon className='w-4 h-4' />
 							</div>
 							<div className='flex flex-col'>
 								<span className='text-[9px] font-black text-espresso-brown/40 uppercase tracking-widest leading-none'>
-									Authenticated
+									Account
 								</span>
 								<span className='text-xs font-bold text-espresso-brown'>
 									{userEmail}
 								</span>
 							</div>
-						</div>
+						</button>
 						<button
 							onClick={handleLogout}
 							className='flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-espresso-brown/40 hover:text-red-500 transition-colors group'>
@@ -458,9 +489,6 @@ Return ONLY valid JSON, no markdown, no backticks:
 												<Plus className='w-5 h-5 text-cobalt-pulse' />
 												Item Variables
 											</h2>
-											<div className='text-[10px] font-black text-cobalt-pulse uppercase tracking-widest bg-cobalt-pulse/10 px-3 py-1 rounded-full'>
-												V.2.0
-											</div>
 										</div>
 
 										<div className='space-y-6'>
@@ -1226,7 +1254,7 @@ Return ONLY valid JSON, no markdown, no backticks:
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: -20 }}
 							>
-								<FlipPricer />
+								<FlipPricer ensureAiConsent={ensureAiConsent} />
 							</motion.div>
 						)}
 
@@ -1333,20 +1361,20 @@ Return ONLY valid JSON, no markdown, no backticks:
 					<div className='flex flex-wrap items-center justify-center gap-x-6 gap-y-3'>
 						<a
 							href='https://dte-solutions.icu'
-							className='text-[10px] font-black uppercase tracking-[0.3em] text-espresso-brown/20 hover:text-cobalt-pulse transition-colors'>
-							DTE Nexus
+							className='text-[10px] font-black uppercase tracking-[0.3em] text-espresso-brown/40 hover:text-cobalt-pulse transition-colors'>
+							DTE Solutions
 						</a>
 						<span className='w-1 h-1 bg-espresso-brown/10 rounded-full' />
 						<a
-							href='#'
-							className='text-[10px] font-black uppercase tracking-[0.3em] text-espresso-brown/20 hover:text-cobalt-pulse transition-colors'>
-							Security Policy
+							href='/privacy.html'
+							className='text-[10px] font-black uppercase tracking-[0.3em] text-espresso-brown/40 hover:text-cobalt-pulse transition-colors'>
+							Privacy
 						</a>
 						<span className='w-1 h-1 bg-espresso-brown/10 rounded-full' />
 						<a
-							href='#'
-							className='text-[10px] font-black uppercase tracking-[0.3em] text-espresso-brown/20 hover:text-cobalt-pulse transition-colors'>
-							Neural Logic
+							href='/terms.html'
+							className='text-[10px] font-black uppercase tracking-[0.3em] text-espresso-brown/40 hover:text-cobalt-pulse transition-colors'>
+							Terms
 						</a>
 					</div>
 					<div className='text-center space-y-1'>
@@ -1385,9 +1413,6 @@ Return ONLY valid JSON, no markdown, no backticks:
 										tab === t.id && "text-cobalt-pulse",
 									)}
 								/>
-								{t.premium && (
-									<Crown className='absolute -top-1 right-1 w-3 h-3 text-resale-gold' />
-								)}
 								{t.id === "inventory" && inv.total > 0 && (
 									<span className='absolute -top-1 right-0.5 bg-cobalt-pulse text-white text-[8px] leading-none px-1.5 py-0.5 rounded-full'>
 										{inv.total}
@@ -1399,6 +1424,19 @@ Return ONLY valid JSON, no markdown, no backticks:
 					))}
 				</div>
 			</nav>
+
+			<AnimatePresence>
+				{consentOpen && <AiConsentDialog key='consent' onAnswer={answerConsent} />}
+				{accountOpen && (
+					<AccountSheet
+						key='account'
+						email={userEmail}
+						aiConsent={aiConsent}
+						onToggleAiConsent={toggleAiConsent}
+						onClose={() => setAccountOpen(false)}
+					/>
+				)}
+			</AnimatePresence>
 		</div>
 	);
 }

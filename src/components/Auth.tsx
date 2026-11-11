@@ -110,6 +110,18 @@ const css = `
     color: #2A8A5A;
     margin-bottom: 16px;
   }
+  .auth-link {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    font-size: 12px;
+    color: #8A8070;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  .auth-link-strong { font-size: 13px; color: #1C1C1C; font-weight: 600; }
+  .auth-app a { color: inherit; }
   .auth-divider {
     display: flex;
     align-items: center;
@@ -120,8 +132,14 @@ const css = `
   .auth-divider-text { font-size: 12px; color: #B0A898; letter-spacing: 0.05em; }
 `;
 
-export default function Auth() {
-  const [mode, setMode] = useState<"login" | "signup">("login");
+type Props = {
+  /** Set when the user arrived from a password-reset email link. */
+  recovery?: boolean;
+  onRecovered?: () => void;
+};
+
+export default function Auth({ recovery = false, onRecovered }: Props) {
+  const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -130,6 +148,30 @@ export default function Auth() {
   const [success, setSuccess] = useState<string | null>(null);
 
   async function handleSubmit() {
+    if (recovery) {
+      if (password.length < 8) return setError("Use at least 8 characters.");
+      setLoading(true);
+      setError(null);
+      const { error } = await supabase.auth.updateUser({ password });
+      setLoading(false);
+      if (error) setError(error.message);
+      else onRecovered?.();
+      return;
+    }
+    if (mode === "forgot") {
+      if (!email) return;
+      setLoading(true);
+      setError(null);
+      setSuccess(null);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: import.meta.env.VITE_SITE_URL || window.location.origin,
+      });
+      setLoading(false);
+      // Same message either way so the form can't be used to probe for accounts.
+      if (error && error.status !== 400) setError(error.message);
+      else setSuccess("If an account exists for that email, a reset link is on its way.");
+      return;
+    }
     if (!email || !password) return;
     setLoading(true);
     setError(null);
@@ -144,6 +186,12 @@ export default function Auth() {
       else setSuccess("Check your email to confirm your account, then log in.");
     }
     setLoading(false);
+  }
+
+  function switchMode(next: typeof mode) {
+    setMode(next);
+    setError(null);
+    setSuccess(null);
   }
 
   async function handleGoogle() {
@@ -173,76 +221,115 @@ export default function Auth() {
       <div className="auth-card">
         <div style={{ marginBottom: 24 }}>
           <div style={{ fontSize: 11, color: "#B0A898", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 6 }}>
-            {mode === "login" ? "Welcome back" : "Create account"}
+            {recovery ? "Account recovery" : mode === "login" ? "Welcome back" : mode === "signup" ? "Create account" : "Forgot password"}
           </div>
           <div style={{ fontSize: 20, fontWeight: 700, color: "#1C1C1C" }}>
-            {mode === "login" ? "Sign in to your vault" : "Initialize your vault"}
+            {recovery ? "Choose a new password" : mode === "login" ? "Sign in to your vault" : mode === "signup" ? "Initialize your vault" : "Reset your password"}
           </div>
         </div>
 
         {error && <div className="auth-error">{error}</div>}
         {success && <div className="auth-success">{success}</div>}
 
-        <div style={{ marginBottom: 14 }}>
-          <div style={{ fontSize: 11, color: "#B0A898", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>Email</div>
-          <input
-            className="auth-input"
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && handleSubmit()}
-          />
-        </div>
-
-        <div style={{ marginBottom: 20 }}>
-          <div style={{ fontSize: 11, color: "#B0A898", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>Password</div>
-          <div className="auth-input-container">
+        {!recovery && (
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ fontSize: 11, color: "#B0A898", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 6 }}>Email</div>
             <input
               className="auth-input"
-              type={showPassword ? "text" : "password"}
-              placeholder="••••••••"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
+              type="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
               onKeyDown={e => e.key === "Enter" && handleSubmit()}
             />
-            <button 
-              type="button" 
-              className="auth-password-toggle"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </div>
+        )}
+
+        {mode !== "forgot" && (
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
+              <div style={{ fontSize: 11, color: "#B0A898", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                {recovery ? "New password" : "Password"}
+              </div>
+              {mode === "login" && !recovery && (
+                <button type="button" className="auth-link" onClick={() => switchMode("forgot")}>
+                  Forgot password?
+                </button>
+              )}
+            </div>
+            <div className="auth-input-container">
+              <input
+                className="auth-input"
+                type={showPassword ? "text" : "password"}
+                autoComplete={mode === "login" && !recovery ? "current-password" : "new-password"}
+                placeholder="••••••••"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && handleSubmit()}
+              />
+              <button
+                type="button"
+                className="auth-password-toggle"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
+        )}
+
+        <button
+          className="auth-btn"
+          onClick={handleSubmit}
+          disabled={loading || (recovery ? !password : mode === "forgot" ? !email : !email || !password)}
+        >
+          {loading
+            ? "Processing..."
+            : recovery ? "Save Password"
+            : mode === "login" ? "Sign In"
+            : mode === "signup" ? "Create Account"
+            : "Send Reset Link"}
+        </button>
+
+        {mode !== "forgot" && !recovery && (
+          <>
+            <div className="auth-divider">
+              <div className="auth-divider-line"></div>
+              <div className="auth-divider-text">or</div>
+              <div className="auth-divider-line"></div>
+            </div>
+
+            <button className="auth-btn-ghost" onClick={handleGoogle}>
+              🔐 Continue with Google
+            </button>
+          </>
+        )}
+
+        {!recovery && (
+          <div style={{ textAlign: "center", marginTop: 20, fontSize: 13, color: "#B0A898" }}>
+            {mode === "login" ? "No account? " : mode === "signup" ? "Already have one? " : "Remembered it? "}
+            <button type="button" className="auth-link auth-link-strong" onClick={() => switchMode(mode === "login" ? "signup" : "login")}>
+              {mode === "login" ? "Sign up free" : "Sign in"}
             </button>
           </div>
-        </div>
+        )}
 
-        <button className="auth-btn" onClick={handleSubmit} disabled={!email || !password || loading}>
-          {loading ? "Processing..." : mode === "login" ? "Sign In" : "Create Account"}
-        </button>
-
-        <div className="auth-divider">
-          <div className="auth-divider-line"></div>
-          <div className="auth-divider-text">or</div>
-          <div className="auth-divider-line"></div>
-        </div>
-
-        <button className="auth-btn-ghost" onClick={handleGoogle}>
-          🔐 Continue with Google
-        </button>
-
-        <div style={{ textAlign: "center", marginTop: 20, fontSize: 13, color: "#B0A898" }}>
-          {mode === "login" ? "No account? " : "Already have one? "}
-          <span
-            onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(null); setSuccess(null); }}
-            style={{ color: "#1C1C1C", fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}
-          >
-            {mode === "login" ? "Sign up free" : "Sign in"}
-          </span>
-        </div>
+        {mode === "signup" && !recovery && (
+          <div style={{ textAlign: "center", marginTop: 14, fontSize: 12, color: "#B0A898", lineHeight: 1.5 }}>
+            By creating an account you agree to the <a href="/terms.html">Terms</a> and{" "}
+            <a href="/privacy.html">Privacy Policy</a>.
+          </div>
+        )}
       </div>
 
-      <div style={{ marginTop: 24, fontSize: 11, color: "#B0A898", letterSpacing: "0.08em" }}>
-        DTE NEXUS · SECURED BY SUPABASE
+      <div style={{ marginTop: 24, fontSize: 11, color: "#B0A898", letterSpacing: "0.08em", display: "flex", gap: 14 }}>
+        <a href="/privacy.html">PRIVACY</a>
+        <span>·</span>
+        <a href="/terms.html">TERMS</a>
+        <span>·</span>
+        <span>SECURED BY SUPABASE</span>
       </div>
     </div>
   );

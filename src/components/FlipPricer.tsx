@@ -197,7 +197,7 @@ const VERDICT_EMOJI: Record<string, string> = {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function FlipPricer() {
+export default function FlipPricer({ ensureAiConsent }: { ensureAiConsent: () => Promise<boolean> }) {
   const [view, setView] = useState<View>("categories");
   const [cat, setCat] = useState<Category | null>(null);
   const [formData, setFormData] = useState<Record<string, string>>({});
@@ -255,6 +255,7 @@ Rules:
       return;
     }
     setError(null);
+    if (!(await ensureAiConsent())) return;
     setLoading(true);
     setResult(null);
     setResultTab("price");
