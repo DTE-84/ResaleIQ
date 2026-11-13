@@ -7,9 +7,15 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test:security": "node --experimental-transform-types --test tests/security.test.ts tests/delete-account.test.ts"
+    "test:security": "node --experimental-transform-types --test tests/security.test.ts tests/delete-account.test.ts",
+    "cap:sync": "npm run build && cap sync",
+    "cap:open:ios": "cap open ios",
+    "cap:open:android": "cap open android"
   },
   "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/ios": "^8.6.0",
     "@supabase/supabase-js": "^2.108.2",
     "clsx": "^2.1.1",
     "framer-motion": "^12.40.0",
@@ -19,6 +25,7 @@
     "tailwind-merge": "^3.0.1"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.6.0",
     "@electric-sql/pglite": "0.5.15",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

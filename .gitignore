@@ -31,3 +31,21 @@ dist-ssr
 
 .vercel
 .env*
+
+# Capacitor — web assets synced into native projects are generated from dist/
+ios/App/App/public
+android/app/src/main/assets/public
+ios/App/App/capacitor.config.json
+android/app/src/main/assets/capacitor.config.json
+
+# Capacitor native build output
+ios/App/build
+ios/App/Pods
+ios/App/Podfile.lock
+ios/DerivedData
+android/.gradle
+android/build
+android/app/build
+android/captures
+android/local.properties
+android/.idea
