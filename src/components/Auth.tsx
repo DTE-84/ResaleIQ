@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
+import { authRedirect, signInWithGoogle } from "../lib/native";
 import { Eye, EyeOff } from "lucide-react";
 
 const css = `
@@ -163,9 +164,7 @@ export default function Auth({ recovery = false, onRecovered }: Props) {
       setLoading(true);
       setError(null);
       setSuccess(null);
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: import.meta.env.VITE_SITE_URL || window.location.origin,
-      });
+      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: authRedirect });
       setLoading(false);
       // Same message either way so the form can't be used to probe for accounts.
       if (error && error.status !== 400) setError(error.message);
@@ -181,7 +180,7 @@ export default function Auth({ recovery = false, onRecovered }: Props) {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) setError(error.message);
     } else {
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: authRedirect } });
       if (error) setError(error.message);
       else setSuccess("Check your email to confirm your account, then log in.");
     }
@@ -195,10 +194,12 @@ export default function Auth({ recovery = false, onRecovered }: Props) {
   }
 
   async function handleGoogle() {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: import.meta.env.VITE_SITE_URL || window.location.origin },
-    });
+    setError(null);
+    try {
+      await signInWithGoogle();
+    } catch {
+      setError("Google sign-in is unavailable right now. Try email instead.");
+    }
   }
 
   return (

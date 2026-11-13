@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
+import { listenForAuthLinks } from "../lib/native";
 import Auth from "./Auth";
 import ResaleIQ from "../ResaleIQ";
 
@@ -23,7 +24,13 @@ export default function App() {
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    // In the native app, auth links come back as deep links instead of page loads
+    const stopAuthLinks = listenForAuthLinks(() => setRecovering(true));
+
+    return () => {
+      subscription.unsubscribe();
+      stopAuthLinks();
+    };
   }, []);
 
   if (loading) return (

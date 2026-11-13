@@ -20,10 +20,25 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.dtesolutions.resaleiq</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.dtesolutions.resaleiq</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>ResaleIQ uses the camera when you scan an item, so it can identify it for your listing.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>ResaleIQ opens your photo library when you choose a photo of an item to scan.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
